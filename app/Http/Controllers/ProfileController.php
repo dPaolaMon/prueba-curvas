@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\CommonDataService;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
+
+class ProfileController extends Controller
+{
+
+    /**
+     * Display the user's profile form.
+     */
+    public function edit(Request $request): View
+    {
+        $allowedThemes = CommonDataService::getThemeValues();
+        $theme = $request->session()->get('theme', $request->user()->theme ?? 'normal');
+
+        if (! in_array($theme, $allowedThemes, true)) {
+            $theme = 'normal';
+        }
+
+        $request->session()->put('theme', $theme);
+
+        return view('profile.edit', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
+     * Update the user's profile information.
+     * Solo actualizo el nombre y el correo electrónico, el username no se puede actualizar.
+     */
+    public function update(ProfileUpdateRequest $request): RedirectResponse
+    {
+        $request->user()->fill($request->safe()->only(['name', 'email']));
+
+        if ($request->user()->isDirty('email')) {
+            $request->user()->email_verified_at = null;
+        }
+
+        $request->user()->save();
+
+        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * Update the user's theme preference.
+     */
+    public function updateTheme(Request $request): RedirectResponse
+    {
+        $allowedThemes = CommonDataService::getThemeValues();
+        
+        $validated = $request->validate([
+            'theme' => ['nullable', 'string', Rule::in($allowedThemes)],
+        ]);
+
+        $theme = $validated['theme'] ?? null;
+
+        $request->user()->update([
+            'theme' => $theme,
+        ]);
+
+        $request->session()->put('theme', $theme ?? 'normal');
+
+        return Redirect::route('profile.edit')->with('status', 'theme-updated');
+    }
+
+    /**
+     * Delete the user's account.
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        $request->validateWithBag('userDeletion', [
+            'password' => ['required', 'current_password'],
+        ]);
+
+        $user = $request->user();
+
+        Auth::logout();
+
+        $user->delete();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return Redirect::to('/');
+    }
+}

@@ -1,0 +1,35 @@
+{
+  "estado_civil": [
+    "Soltero/a",
+    "Casado/a",
+    "Divorciado/a",
+    "Viudo/a",
+    "Unión Libre",
+    "Separado/a"
+  ],
+  "metodo_pago": [
+    "Efectivo",
+    "Tarjeta de Crédito",
+    "Tarjeta de Débito",
+    "Transferencia Bancaria",
+    "Cheque",
+    "MercadoPago",
+    "PayPal",
+    "Criptomoneda"
+  ],
+  "roles": [
+    "Socia",
+    "Gerente",
+    "Entrenadora",
+    "Administrador",
+    "Invitado"
+  ],
+  "temas": [
+    { "value": "normal", "es": "Normal", "en": "Normal" },
+    { "value": "blue", "es": "Azul", "en": "Blue" },
+    { "value": "pink", "es": "Rosa", "en": "Pink" },
+    { "value": "purple", "es": "Púrpura", "en": "Purple" },
+    { "value": "mint", "es": "Menta", "en": "Mint" }
+  ]
+}
+
