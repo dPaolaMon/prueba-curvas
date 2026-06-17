@@ -7,6 +7,7 @@ use App\Models\Mensaje;
 use App\Models\MensajeDestinatario;
 use App\Models\MensajeRemitenteEliminado;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -47,11 +48,20 @@ class MensajeController extends Controller
     public function create(Request $request): View
     {
         $usuario = $request->user();
-        $esSocia = strtoupper((string) $usuario->role) === 'SOCIA';
-
-        // Socias solo pueden escribir a usuarios con otros roles; el resto puede escribir a todos.
         $destinatariosDisponibles = User::where('id', '!=', $usuario->id)
-            ->when($esSocia, fn ($q) => $q->whereRaw('UPPER(role) != ?', ['SOCIA']))
+            ->where('suspendido', false)
+            ->where(function ($query) {
+                $query->whereIn(DB::raw('UPPER(role)'), ['GERENTE', 'ENTRENADORA', 'ADMINISTRADOR'])
+                    ->orWhere(function ($subQuery) {
+                        $subQuery->whereRaw('UPPER(role) = ?', ['SOCIA'])
+                            ->whereExists(function ($existsQuery) {
+                                $existsQuery->selectRaw('1')
+                                    ->from('socias')
+                                    ->whereColumn('socias.user_id', 'users.id')
+                                    ->where('socias.estatus', 'Activa');
+                            });
+                    });
+            })
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 

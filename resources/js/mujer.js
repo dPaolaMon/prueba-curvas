@@ -255,7 +255,7 @@ const MAPA_CORPORAL_SILUETA = {
         { id: 38, lado: -1, fuerza: 1 },   { id: 99, lado: 1, fuerza: 1 }      // Principal
     ],
     abdomen: [
-        { id: 39, lado: -1, fuerza: 1 }, { id: 98, lado: 1, fuerza: 1 }
+        { id: 39, lado: -1, fuerza: 0.2 }, { id: 98, lado: 1, fuerza: 0.2 }
     ],
     cadera: [
         { id: 40, lado: -1, fuerza: 1 }, { id: 97, lado: 1, fuerza: 1 },
@@ -274,7 +274,7 @@ const MAPA_CORPORAL_SILUETA = {
 
 const MAPA_CORPORAL_TANGA = {
     abdomen: [
-        { id: 1, lado: -1, fuerza: 1 }, { id: 6, lado: 1, fuerza: 1 }
+        { id: 1, lado: -1, fuerza: 0.2 }, { id: 6, lado: 1, fuerza: 0.2 }
     ],
     cadera: [
         { id: 2, lado: -1, fuerza: 1 }, { id: 5, lado: 1, fuerza: 1 },

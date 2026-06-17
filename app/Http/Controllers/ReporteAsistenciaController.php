@@ -16,12 +16,61 @@ class ReporteAsistenciaController extends Controller
         $fechaInicio = $request->get('fecha_inicio');
         $fechaFin = $request->get('fecha_fin');
         $search = trim((string) $request->get('search', ''));
+        $sort = $request->get('sort', 'total');
+        $direction = strtolower((string) $request->get('direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        if (!in_array($sort, ['total', 'num_socia', 'nombre'], true)) {
+            $sort = 'total';
+        }
 
         // Determinar las fechas según el filtro
         [$fechaInicio, $fechaFin] = $this->calcularFechas($filtro, $fechaInicio, $fechaFin);
 
         // Determinar si mostrar detalle de fechas (solo para opciones 1, 2, 3)
         $mostrarDetalle = in_array($filtro, ['1', '2', '3']);
+
+        $asistenciasHoy = Asistencia::with('socia')
+            ->whereDate('fecha', Carbon::today())
+            ->whereHas('socia', function ($query) {
+                $query->where('estatus', 'Activa');
+            })
+            ->orderBy('hora')
+            ->get()
+            ->map(function ($asistencia) {
+                return [
+                    'num_socia' => $asistencia->socia?->num_socia,
+                    'nombre' => trim(($asistencia->socia?->nombre ?? '') . ' ' . ($asistencia->socia?->apellidos ?? '')),
+                    'hora' => optional($asistencia->hora)->format('H:i'),
+                ];
+            })
+            ->values();
+
+        $hoy = Carbon::today();
+        $ausenciasConsecutivas = Socia::where('estatus', 'Activa')
+            ->withMax('asistencias as ultima_fecha_asistencia', 'fecha')
+            ->orderBy('num_socia')
+            ->get()
+            ->map(function ($socia) use ($hoy) {
+                $fechaReferencia = $socia->ultima_fecha_asistencia
+                    ? Carbon::parse($socia->ultima_fecha_asistencia)
+                    : Carbon::parse($socia->fecha_reingreso ?? $socia->fecha_alta ?? $hoy->format('Y-m-d'));
+
+                $diasAusencia = $fechaReferencia->diffInDays($hoy);
+
+                return [
+                    'num_socia' => $socia->num_socia,
+                    'nombre' => trim($socia->nombre . ' ' . $socia->apellidos),
+                    'dias_ausencia' => $diasAusencia,
+                    'ultima_asistencia' => $socia->ultima_fecha_asistencia
+                        ? Carbon::parse($socia->ultima_fecha_asistencia)->locale('es')->isoFormat('DD/MM/YYYY')
+                        : 'Sin asistencias registradas',
+                ];
+            })
+            ->filter(function ($fila) {
+                return $fila['dias_ausencia'] > 2;
+            })
+            ->sortByDesc('dias_ausencia')
+            ->values();
 
         // Obtener todas las socias activas
         $socias = Socia::where('estatus', 'Activa')
@@ -81,6 +130,23 @@ class ReporteAsistenciaController extends Controller
             $datosReporte[] = $fila;
         }
 
+        usort($datosReporte, function (array $a, array $b) use ($sort, $direction) {
+            if ($sort === 'nombre') {
+                $cmp = strcmp((string) $a['nombre'], (string) $b['nombre']);
+                return $direction === 'asc' ? $cmp : -$cmp;
+            }
+
+            $valueA = $sort === 'total' ? (int) $a['total'] : (int) $a['num_socia'];
+            $valueB = $sort === 'total' ? (int) $b['total'] : (int) $b['num_socia'];
+
+            if ($valueA === $valueB) {
+                return (int) $a['num_socia'] <=> (int) $b['num_socia'];
+            }
+
+            $cmp = $valueA <=> $valueB;
+            return $direction === 'asc' ? $cmp : -$cmp;
+        });
+
         return view('reportes.asistencia', [
             'datosReporte' => $datosReporte,
             'fechas' => $fechas,
@@ -89,6 +155,10 @@ class ReporteAsistenciaController extends Controller
             'fechaInicio' => $fechaInicio,
             'fechaFin' => $fechaFin,
             'search' => $search,
+            'sort' => $sort,
+            'direction' => $direction,
+            'asistenciasHoy' => $asistenciasHoy,
+            'ausenciasConsecutivas' => $ausenciasConsecutivas,
         ]);
     }
 

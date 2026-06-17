@@ -43,6 +43,10 @@
                         ¡Hola, {{ $nombre_socia }}! 💜
                     </h3>
 
+                    <div class="mb-2">
+                        <span class="badge text-bg-light border px-3 py-2">Socia #{{ $socia->num_socia }}</span>
+                    </div>
+
                     <p class="text-muted mb-0">
                         Bienvenida a tu espacio. Aquí puedes revisar tu membresía, pagos y reservar clases.
                     </p>

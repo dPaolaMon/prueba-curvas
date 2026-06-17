@@ -18,6 +18,7 @@ class Medida extends Model
         'brazo',
         'peso',
         'altura',
+        'imc',
         'porcentaje_grasa',
     ];
 

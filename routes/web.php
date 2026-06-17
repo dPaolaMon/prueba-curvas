@@ -151,6 +151,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/medidas', [MedidaController::class, 'index'])->name('medidas.index');
         Route::post('/medidas', [MedidaController::class, 'store'])->name('medidas.store');
         Route::get('/medidas/create', [MedidaController::class, 'create'])->name('medidas.create');
+        Route::get('/medidas/socias/{socia}/historial', [MedidaController::class, 'historial'])->name('medidas.historial');
+        Route::get('/medidas/socias/{socia}/historial/export', [MedidaController::class, 'exportHistorial'])->name('medidas.historial.export');
         Route::get('/medidas/{medida}/edit', [MedidaController::class, 'edit'])->name('medidas.edit');
         Route::match(['put', 'patch'], '/medidas/{medida}', [MedidaController::class, 'update'])->name('medidas.update');
         Route::delete('/medidas/{medida}', [MedidaController::class, 'destroy'])->name('medidas.destroy');

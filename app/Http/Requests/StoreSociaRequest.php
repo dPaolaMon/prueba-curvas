@@ -51,6 +51,8 @@ class StoreSociaRequest extends FormRequest
             'estado_id' => ['required', 'exists:estados,id'],
 
             'metodo_pago' => ['required', 'string', 'max:32'],
+            'fecha_alta' => ['required', 'date'],
+            'fecha_reingreso' => ['required', 'date'],
 
             'contacto_emergencia' => ['nullable', 'string'],
             'padecimiento_cronico' => ['nullable', 'string'],

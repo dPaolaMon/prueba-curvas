@@ -118,6 +118,38 @@
                 </datalist>
             </div>
 
+            {{-- Fecha de Alta --}}
+            <div class="col-12 col-md-6 col-lg-4">
+                <label for="fecha_alta" class="form-label">
+                    Fecha Alta <span class="text-danger">*</span>
+                </label>
+                <input
+                    type="date"
+                    id="fecha_alta"
+                    name="fecha_alta"
+                    class="form-control"
+                    value="{{ old('fecha_alta', optional($socia->fecha_alta)->format('Y-m-d') ?? now()->format('Y-m-d')) }}"
+                    @if(!$editando) readonly @endif
+                    required
+                >
+            </div>
+
+            {{-- Fecha de Reingreso --}}
+            <div class="col-12 col-md-6 col-lg-4">
+                <label for="fecha_reingreso" class="form-label">
+                    Fecha Reingreso <span class="text-danger">*</span>
+                </label>
+                <input
+                    type="date"
+                    id="fecha_reingreso"
+                    name="fecha_reingreso"
+                    class="form-control"
+                    value="{{ old('fecha_reingreso', optional($socia->fecha_reingreso)->format('Y-m-d') ?? now()->format('Y-m-d')) }}"
+                    @if(!$editando) readonly @endif
+                    required
+                >
+            </div>
+
             {{-- Foto --}}
             <div class="col-12 col-md-6 col-lg-4">
                 <label for="foto" class="form-label">Foto</label>

@@ -60,6 +60,9 @@
                             @if(count($datosReporte) > 0)
                                 <button type="button" id="btnExportarCsv" class="btn btn-outline-secondary">Exportar CSV</button>
                             @endif
+
+                            <button type="button" id="btnAsistenciaHoy" class="btn btn-outline-secondary">Asistencia de hoy</button>
+                            <button type="button" id="btnAusenciasConsecutivas" class="btn btn-outline-secondary">Ausencias consecutivas</button>
                         </div>
                     </div>
                 </form>
@@ -79,7 +82,17 @@
                                             </th>
                                         @endforeach
                                     @endif
-                                    <th scope="col" class="text-center bg-body-secondary">Total</th>
+                                    <th scope="col" class="text-center bg-body-secondary">
+                                        @php
+                                            $totalDirection = (($sort ?? 'total') === 'total' && ($direction ?? 'desc') === 'asc') ? 'desc' : 'asc';
+                                        @endphp
+                                        <a href="{{ route('reportes.asistencia', array_merge(request()->query(), ['sort' => 'total', 'direction' => $totalDirection])) }}" class="link-body-emphasis text-decoration-none">
+                                            <span>Total</span>
+                                            @if(($sort ?? 'total') === 'total')
+                                                <span class="ms-1">{{ ($direction ?? 'desc') === 'asc' ? '↑' : '↓' }}</span>
+                                            @endif
+                                        </a>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -133,6 +146,10 @@
             const fechaInicioInput = document.getElementById('fecha_inicio');
             const fechaFinInput = document.getElementById('fecha_fin');
             const btnExportarCsv = document.getElementById('btnExportarCsv');
+            const btnAsistenciaHoy = document.getElementById('btnAsistenciaHoy');
+            const btnAusenciasConsecutivas = document.getElementById('btnAusenciasConsecutivas');
+            const asistenciasHoy = @json($asistenciasHoy);
+            const ausenciasConsecutivas = @json($ausenciasConsecutivas);
             const themeColor = getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd';
 
             function mostrarToast(icon, title) {
@@ -211,6 +228,93 @@
                 });
             }
 
+            function mostrarAsistenciaHoy() {
+                if (!Array.isArray(asistenciasHoy) || asistenciasHoy.length === 0) {
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Sin asistencias hoy',
+                        text: 'No hay socias activas con asistencia registrada en el día de hoy.',
+                        confirmButtonColor: themeColor,
+                    });
+                    return;
+                }
+
+                const filas = asistenciasHoy.map(function (item) {
+                    const numero = item.num_socia ? '#' + item.num_socia : '#—';
+                    const nombre = item.nombre || 'Socia sin nombre';
+                    const hora = item.hora ? item.hora + ' h' : 'sin hora';
+                    return `<tr><td class="text-nowrap">${numero}</td><td>${nombre}</td><td class="text-nowrap text-end">${hora}</td></tr>`;
+                }).join('');
+
+                const html = `
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Num Socia</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col" class="text-end">Hora</th>
+                                </tr>
+                            </thead>
+                            <tbody>${filas}</tbody>
+                        </table>
+                    </div>
+                `;
+
+                window.Swal.fire({
+                    title: `Asistencia de hoy (${asistenciasHoy.length})`,
+                    html: html,
+                    width: 760,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: themeColor,
+                });
+            }
+
+            function mostrarAusenciasConsecutivas() {
+                if (!Array.isArray(ausenciasConsecutivas) || ausenciasConsecutivas.length === 0) {
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Sin ausencias consecutivas',
+                        text: 'No hay socias activas con más de 2 ausencias seguidas.',
+                        confirmButtonColor: themeColor,
+                    });
+                    return;
+                }
+
+                const filas = ausenciasConsecutivas.map(function (item) {
+                    const numero = item.num_socia ? '#' + item.num_socia : '#—';
+                    const nombre = item.nombre || 'Socia sin nombre';
+                    const dias = item.dias_ausencia + ' días';
+                    const ultima = item.ultima_asistencia || 'Sin asistencias registradas';
+
+                    return `<tr><td class="text-nowrap">${numero}</td><td>${nombre}</td><td class="text-end text-nowrap">${dias}</td><td class="text-nowrap">${ultima}</td></tr>`;
+                }).join('');
+
+                const html = `
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Num Socia</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col" class="text-end">Días sin asistir</th>
+                                    <th scope="col">Última asistencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>${filas}</tbody>
+                        </table>
+                    </div>
+                `;
+
+                window.Swal.fire({
+                    title: `Ausencias consecutivas (${ausenciasConsecutivas.length})`,
+                    html: html,
+                    width: 820,
+                    confirmButtonText: 'Cerrar',
+                    confirmButtonColor: themeColor,
+                });
+            }
+
             filtroSelect.addEventListener('change', toggleFechasPersonalizadas);
 
             filtroForm.addEventListener('submit', function (event) {
@@ -221,6 +325,14 @@
 
             if (btnExportarCsv) {
                 btnExportarCsv.addEventListener('click', exportarCSV);
+            }
+
+            if (btnAsistenciaHoy) {
+                btnAsistenciaHoy.addEventListener('click', mostrarAsistenciaHoy);
+            }
+
+            if (btnAusenciasConsecutivas) {
+                btnAusenciasConsecutivas.addEventListener('click', mostrarAusenciasConsecutivas);
             }
 
             toggleFechasPersonalizadas();

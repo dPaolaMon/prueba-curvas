@@ -48,7 +48,7 @@
         @endif
 
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ route('medidas.create') }}" class="btn btn-primary">Nueva Medida</a>
+            <a href="{{ route('medidas.create', ['return_to' => request()->fullUrl()]) }}" class="btn btn-primary">Nueva Medida</a>
         </div>
 
         <div class="table-responsive">
@@ -75,6 +75,7 @@
                         <th scope="col">Brazo</th>
                         <th scope="col">Peso</th>
                         <th scope="col">Altura</th>
+                        <th scope="col">IMC</th>
                         <th scope="col">% Grasa</th>
                         <th scope="col">Acciones</th>
                     </tr>
@@ -93,11 +94,18 @@
                         <td>{{ $medida->brazo }}</td>
                         <td>{{ $medida->peso }}</td>
                         <td>{{ $medida->altura }}</td>
+                        <td>{{ $medida->imc }}</td>
                         <td>{{ $medida->porcentaje_grasa }}</td>
 
                         <td>
                             <div class="btn-group btn-group-sm" role="group" aria-label="Acciones de medida">
-                                <a href="{{ route('medidas.edit', $medida) }}" class="btn btn-outline-secondary" title="Editar">
+                                @if($medida->socia)
+                                    <a href="{{ route('medidas.historial', $medida->socia) }}" class="btn btn-outline-info" title="Historial">
+                                        <x-ojito-ver />
+                                    </a>
+                                @endif
+
+                                <a href="{{ route('medidas.edit', [$medida, 'return_to' => request()->fullUrl()]) }}" class="btn btn-outline-secondary" title="Editar">
                                     <x-lapiz-editar />
                                 </a>
 
@@ -115,7 +123,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="12">
+                        <td colspan="13">
                             <div class="alert alert-secondary mb-0 text-center" role="alert">
                                 No hay medidas registradas aún.
                             </div>

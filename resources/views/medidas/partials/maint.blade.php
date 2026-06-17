@@ -4,6 +4,7 @@
 
 <div>
     @csrf
+    <input type="hidden" name="return_to" value="{{ $returnTo ?? route('medidas.index') }}">
     @if($editando)
         @method('PUT')
     @endif
@@ -96,7 +97,15 @@
         <div class="col-12 col-md-4">
             <label for="altura" class="form-label">Altura <span class="text-danger">*</span></label>
             <input type="number" step="0.01" min="0" id="altura" name="altura" class="form-control" value="{{ old('altura', $medida->altura ?? '') }}" required>
+            <div class="form-text">Captura la altura en cm.</div>
             @error('altura')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+        </div>
+
+        <div class="col-12 col-md-4">
+            <label for="imc" class="form-label">IMC <span class="text-danger">*</span></label>
+            <input type="number" step="0.01" min="0" id="imc" name="imc" class="form-control" value="{{ old('imc', $medida->imc ?? '') }}" required>
+            <div class="form-text">Se calcula automáticamente con peso y altura, pero puedes ajustarlo manualmente.</div>
+            @error('imc')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
         </div>
 
         <div class="col-12 col-md-4">
@@ -107,7 +116,7 @@
     </div>
 
     <div class="d-flex gap-2 justify-content-end pt-4 border-top mt-4">
-        <a href="{{ route('medidas.index') }}" class="btn btn-secondary">
+        <a href="{{ $returnTo ?? route('medidas.index') }}" class="btn btn-secondary">
             Cancelar
         </a>
         <button type="submit" class="btn btn-primary">
@@ -115,3 +124,75 @@
         </button>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const pesoInput = document.getElementById('peso');
+        const alturaInput = document.getElementById('altura');
+        const imcInput = document.getElementById('imc');
+
+        if (!pesoInput || !alturaInput || !imcInput) {
+            return;
+        }
+
+        let imcManual = false;
+        let ultimoImcAutomatico = '';
+
+        function normalizarNumero(valor) {
+            return Number.parseFloat(String(valor || '').replace(',', '.'));
+        }
+
+        function calcularImc() {
+            const peso = normalizarNumero(pesoInput.value);
+            const altura = normalizarNumero(alturaInput.value);
+
+            if (!Number.isFinite(peso) || !Number.isFinite(altura) || peso <= 0 || altura <= 0) {
+                return null;
+            }
+
+            const alturaMetros = altura > 3 ? altura / 100 : altura;
+
+            if (alturaMetros <= 0) {
+                return null;
+            }
+
+            return (peso / (alturaMetros * alturaMetros)).toFixed(2);
+        }
+
+        function actualizarImcAutomatico() {
+            const imcCalculado = calcularImc();
+
+            if (imcCalculado === null) {
+                if (!imcManual) {
+                    imcInput.value = '';
+                    ultimoImcAutomatico = '';
+                }
+
+                return;
+            }
+
+            if (!imcManual || imcInput.value === '' || imcInput.value === ultimoImcAutomatico) {
+                imcInput.value = imcCalculado;
+                ultimoImcAutomatico = imcCalculado;
+                imcManual = false;
+            }
+        }
+
+        imcInput.addEventListener('input', function () {
+            const valorActual = imcInput.value.trim();
+
+            if (valorActual === '') {
+                imcManual = false;
+                actualizarImcAutomatico();
+                return;
+            }
+
+            imcManual = valorActual !== ultimoImcAutomatico;
+        });
+
+        pesoInput.addEventListener('input', actualizarImcAutomatico);
+        alturaInput.addEventListener('input', actualizarImcAutomatico);
+
+        actualizarImcAutomatico();
+    });
+</script>

@@ -15,12 +15,12 @@ class SociaController extends Controller
     public function index(Request $request)
     {
         $search = trim((string) $request->query('search', ''));
-        $sort = $request->query('sort', 'num_socia');
+        $sort = $request->query('sort', 'estatus');
         $direction = strtolower((string) $request->query('direction', 'asc')) === 'desc' ? 'desc' : 'asc';
 
-        $allowedSorts = ['num_socia', 'nombre', 'fecha_alta', 'fecha_reingreso'];
+        $allowedSorts = ['num_socia', 'nombre', 'estatus', 'fecha_alta', 'fecha_reingreso'];
         if (!in_array($sort, $allowedSorts, true)) {
-            $sort = 'num_socia';
+            $sort = 'estatus';
         }
 
         $query = Socia::with(['estado', 'municipio', 'user'])
@@ -28,6 +28,13 @@ class SociaController extends Controller
                 $q->orderBy('nombre', $direction)
                     ->orderBy('apellidos', $direction);
             }, function ($q) use ($sort, $direction) {
+                if ($sort === 'estatus') {
+                    $q->orderByRaw("CASE WHEN estatus = 'Activa' THEN 0 WHEN estatus = 'Baja' THEN 1 ELSE 2 END {$direction}")
+                        ->orderBy('num_socia', 'asc');
+
+                    return;
+                }
+
                 $q->orderBy($sort, $direction);
             });
 
@@ -109,6 +116,10 @@ class SociaController extends Controller
     public function store(StoreSociaRequest $request)
     {
         $data = $request->validated();
+
+        // En altas se controlan internamente estas fechas.
+        $data['fecha_alta'] = now()->toDateString();
+        $data['fecha_reingreso'] = now()->toDateString();
 
         if ($request->hasFile('foto')) {
             $data['foto'] = $request->file('foto')

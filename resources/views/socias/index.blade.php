@@ -63,11 +63,11 @@
                     <tr>
                         <th scope="col">
                             @php
-                                $numDirection = (($sort ?? 'num_socia') === 'num_socia' && ($direction ?? 'asc') === 'asc') ? 'desc' : 'asc';
+                                $numDirection = (($sort ?? 'estatus') === 'num_socia' && ($direction ?? 'asc') === 'asc') ? 'desc' : 'asc';
                             @endphp
                             <a href="{{ route('socias.index', array_merge(request()->query(), ['sort' => 'num_socia', 'direction' => $numDirection])) }}" class="link-body-emphasis text-decoration-none">
                                 <span>No. Socia</span>
-                                @if(($sort ?? 'num_socia') === 'num_socia')
+                                @if(($sort ?? 'estatus') === 'num_socia')
                                     <span class="ms-1">{{ ($direction ?? 'asc') === 'asc' ? '↑' : '↓' }}</span>
                                 @endif
                             </a>
@@ -87,7 +87,17 @@
                         <th scope="col">Email</th>
                         <th scope="col">Municipio</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Estatus</th>
+                        <th scope="col">
+                            @php
+                                $estatusDirection = (($sort ?? 'estatus') === 'estatus' && ($direction ?? 'asc') === 'asc') ? 'desc' : 'asc';
+                            @endphp
+                            <a href="{{ route('socias.index', array_merge(request()->query(), ['sort' => 'estatus', 'direction' => $estatusDirection])) }}" class="link-body-emphasis text-decoration-none">
+                                <span>Estatus</span>
+                                @if(($sort ?? 'estatus') === 'estatus')
+                                    <span class="ms-1">{{ ($direction ?? 'asc') === 'asc' ? '↑' : '↓' }}</span>
+                                @endif
+                            </a>
+                        </th>
                         <th scope="col">
                             @php
                                 $fechaDirection = (($sort ?? '') === 'fecha_alta' && ($direction ?? 'asc') === 'asc') ? 'desc' : 'asc';
@@ -156,7 +166,7 @@
                                     <x-ojito-ver />
                                 </a>
 
-                                <a href="{{ route('medidas.create', ['socia_id' => $socia->id]) }}" class="btn btn-outline-info" title="Registrar medida" aria-label="Registrar medida">
+                                <a href="{{ route('medidas.create', ['socia_id' => $socia->id, 'return_to' => request()->fullUrl()]) }}" class="btn btn-outline-info" title="Registrar medida" aria-label="Registrar medida">
                                     <x-regla-medida />
                                 </a>
 

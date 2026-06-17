@@ -39,6 +39,16 @@ class AsistenciaController extends Controller
             }
         }
 
+        $hora = $request->input('hora');
+
+        if (empty($hora) && $asistenciaEnFecha) {
+            $hora = Carbon::parse($asistenciaEnFecha->hora)->format('H:i');
+        }
+
+        if (empty($hora)) {
+            $hora = now()->format('H:i');
+        }
+
         return view('asistencia.index', [
             'socias' => $socias,
             'sociaSeleccionada' => $sociaSeleccionada,
@@ -46,6 +56,7 @@ class AsistenciaController extends Controller
             'asistenciaEnFecha' => $asistenciaEnFecha,
             'sociaId' => $request->input('socia_id'),
             'fecha' => $request->input('fecha'),
+            'hora' => $hora,
         ]);
     }
 
@@ -54,10 +65,12 @@ class AsistenciaController extends Controller
         $request->validate([
             'socia_id' => 'required|exists:socias,id',
             'fecha' => 'required|date',
+            'hora' => 'required|date_format:H:i',
         ]);
 
         $socia = Socia::findOrFail($request->input('socia_id'));
         $fecha = $request->input('fecha');
+        $hora = $request->input('hora');
 
         if ($socia->estatus !== 'Activa') {
             return response()->json([
@@ -75,12 +88,12 @@ class AsistenciaController extends Controller
             Asistencia::create([
                 'socia_id' => $socia->id,
                 'fecha' => $fecha,
-                'hora' => now(),
+                'hora' => $hora . ':00',
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => "Asistencia registrada para {$socia->nombre} {$socia->apellidos} el " . Carbon::parse($fecha)->locale('es')->isoFormat('DD/MM/YYYY'),
+                'message' => "Asistencia registrada para {$socia->nombre} {$socia->apellidos} el " . Carbon::parse($fecha)->locale('es')->isoFormat('DD/MM/YYYY') . " a las {$hora}",
             ]);
         }
 

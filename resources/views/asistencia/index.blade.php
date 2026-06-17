@@ -82,13 +82,24 @@
                                 >
                             </div>
 
+                            <div class="mb-3">
+                                <label for="hora" class="form-label">Hora</label>
+                                <input
+                                    type="time"
+                                    name="hora"
+                                    id="hora"
+                                    value="{{ $hora }}"
+                                    class="form-control"
+                                >
+                            </div>
+
                             <div id="statusArea" class="alert alert-secondary mb-4" role="status">
-                                Selecciona socia y fecha para continuar.
+                                Selecciona socia, fecha y hora para continuar.
                             </div>
 
                             <div class="d-grid">
                                 <button type="button" id="toggleBtn" class="btn btn-secondary" disabled>
-                                    Selecciona socia y fecha
+                                    Selecciona socia, fecha y hora
                                 </button>
                             </div>
                         </form>
@@ -118,7 +129,10 @@
                                 <div class="list-group list-group-flush">
                                     @foreach($asistenciasRecientes as $asistencia)
                                         <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
-                                            <span>{{ \Carbon\Carbon::parse($asistencia->fecha)->locale('es')->isoFormat('DD/MM/YYYY (dddd)') }}</span>
+                                            <div>
+                                                <div>{{ \Carbon\Carbon::parse($asistencia->fecha)->locale('es')->isoFormat('DD/MM/YYYY (dddd)') }}</div>
+                                                <div class="small text-body-secondary">{{ \Carbon\Carbon::parse($asistencia->hora)->format('H:i') }} hrs</div>
+                                            </div>
                                             <span class="badge text-bg-success">Registrada</span>
                                         </div>
                                     @endforeach
@@ -146,6 +160,7 @@
             const sociaInput = document.getElementById('socia_id');
             const sociaSearchInput = document.getElementById('socia_search');
             const fechaInput = document.getElementById('fecha');
+            const horaInput = document.getElementById('hora');
             const toggleBtn = document.getElementById('toggleBtn');
             const statusArea = document.getElementById('statusArea');
             const sociasCatalogo = @json($sociasCatalogo);
@@ -214,10 +229,10 @@
 
                 if (!habilitado) {
                     toggleBtn.className = 'btn btn-secondary';
-                    toggleBtn.textContent = 'Selecciona socia y fecha';
+                    toggleBtn.textContent = 'Selecciona socia, fecha y hora';
                     toggleBtn.onclick = null;
                     statusArea.className = 'alert alert-secondary mb-4';
-                    statusArea.innerHTML = 'Selecciona socia y fecha para continuar.';
+                    statusArea.innerHTML = 'Selecciona socia, fecha y hora para continuar.';
                     return;
                 }
 
@@ -240,8 +255,9 @@
             function verificarAsistencia() {
                 const sociaId = sociaInput.value;
                 const fecha = fechaInput.value;
+                const hora = horaInput.value;
 
-                if (!sociaId || !fecha) {
+                if (!sociaId || !fecha || !hora) {
                     actualizarBoton(false, null);
                     return;
                 }
@@ -279,6 +295,7 @@
 
                 const sociaId = sociaInput.value;
                 const fecha = fechaInput.value;
+                const hora = horaInput.value;
 
                 toggleBtn.disabled = true;
                 toggleBtn.textContent = 'Registrando...';
@@ -293,6 +310,7 @@
                     body: JSON.stringify({
                         socia_id: sociaId,
                         fecha: fecha,
+                        hora: hora,
                     }),
                 })
                     .then(function (response) {
@@ -307,7 +325,7 @@
                     .then(function (data) {
                         mostrarToast('success', data.message || 'Asistencia registrada correctamente');
                         setTimeout(function () {
-                            window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}`;
+                            window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}&hora=${hora}`;
                         }, 1200);
                     })
                     .catch(function (error) {
@@ -335,6 +353,7 @@
 
                     const sociaId = sociaInput.value;
                     const fecha = fechaInput.value;
+                    const hora = horaInput.value;
 
                     toggleBtn.disabled = true;
                     toggleBtn.textContent = 'Eliminando...';
@@ -363,7 +382,7 @@
                         .then(function (data) {
                             mostrarToast('success', data.message || 'Asistencia eliminada correctamente');
                             setTimeout(function () {
-                                window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}`;
+                                window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}&hora=${hora}`;
                             }, 1200);
                         })
                         .catch(function (error) {
@@ -376,11 +395,12 @@
             function cargarAsistencias() {
                 const sociaId = sociaInput.value;
                 const fecha = fechaInput.value;
+                const hora = horaInput.value;
 
                 sincronizarBusquedaDesdeSelect();
 
                 if (sociaId && fecha) {
-                    window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}`;
+                    window.location.href = `{{ route('asistencia.index') }}?socia_id=${sociaId}&fecha=${fecha}&hora=${hora}`;
                     return;
                 }
 
@@ -389,6 +409,7 @@
 
             sociaInput.addEventListener('change', cargarAsistencias);
             fechaInput.addEventListener('change', verificarAsistencia);
+            horaInput.addEventListener('change', verificarAsistencia);
             sociaSearchInput.addEventListener('change', sincronizarSelectDesdeBusqueda);
             sociaSearchInput.addEventListener('keydown', function (event) {
                 if (event.key === 'Enter') {
@@ -399,7 +420,7 @@
 
             sincronizarBusquedaDesdeSelect();
 
-            if (sociaInput.value && fechaInput.value) {
+            if (sociaInput.value && fechaInput.value && horaInput.value) {
                 verificarAsistencia();
             }
         });

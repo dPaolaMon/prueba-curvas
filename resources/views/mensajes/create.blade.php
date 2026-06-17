@@ -1,4 +1,20 @@
 <x-app-layout>
+    @php
+        $destinatariosUi = $destinatariosDisponibles->map(function ($usuario) {
+            return [
+                'id' => (int) $usuario->id,
+                'name' => $usuario->name,
+                'role' => ucfirst(strtolower((string) $usuario->role)),
+            ];
+        })->values();
+
+        $destinatariosInicialesUi = collect(old('destinatarios', []))
+            ->map(function ($id) {
+                return (int) $id;
+            })
+            ->values();
+    @endphp
+
     <x-slot name="header">
         <h2 class="fw-semibold fs-4 mb-0">{{ __('Redactar Mensaje') }}</h2>
     </x-slot>
@@ -36,24 +52,21 @@
                                 <label for="destinatarios" class="form-label fw-semibold">
                                     Para <span class="text-danger">*</span>
                                 </label>
-                                <select
-                                    id="destinatarios"
-                                    name="destinatarios[]"
-                                    class="form-select"
-                                    multiple
-                                    required
-                                    size="5"
-                                >
-                                    @foreach($destinatariosDisponibles as $usuario)
-                                        <option
-                                            value="{{ $usuario->id }}"
-                                            @if(is_array(old('destinatarios')) && in_array($usuario->id, old('destinatarios'))) selected @endif
+                                <div id="destinatariosComposer" class="position-relative">
+                                    <div id="destinatariosSelected" class="form-control d-flex flex-wrap gap-2 align-items-center py-2" style="min-height: 46px;">
+                                        <input
+                                            type="text"
+                                            id="destinatariosInput"
+                                            class="border-0 flex-grow-1"
+                                            style="min-width: 180px; outline: none;"
+                                            placeholder="Escribe nombre o rol para agregar destinatarios"
+                                            autocomplete="off"
                                         >
-                                            {{ $usuario->name }} ({{ ucfirst(strtolower($usuario->role)) }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <div class="form-text">Mantén Ctrl / ⌘ para seleccionar varios destinatarios.</div>
+                                    </div>
+                                    <div id="destinatariosSuggestions" class="list-group position-absolute w-100 shadow-sm d-none" style="z-index: 20; max-height: 220px; overflow-y: auto;"></div>
+                                    <div id="destinatariosHidden"></div>
+                                </div>
+                                <div class="form-text">Escribe para buscar, Enter para agregar, Backspace para quitar el último.</div>
                                 @error('destinatarios')
                                     <div class="text-danger small mt-1">{{ $message }}</div>
                                 @enderror
@@ -108,4 +121,175 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const destinatariosDisponibles = @json($destinatariosUi);
+            const destinatariosIniciales = @json($destinatariosInicialesUi);
+
+            const composer = document.getElementById('destinatariosComposer');
+            const selectedContainer = document.getElementById('destinatariosSelected');
+            const input = document.getElementById('destinatariosInput');
+            const suggestions = document.getElementById('destinatariosSuggestions');
+            const hiddenContainer = document.getElementById('destinatariosHidden');
+
+            if (!composer || !selectedContainer || !input || !suggestions || !hiddenContainer) {
+                return;
+            }
+
+            const disponiblesById = new Map(destinatariosDisponibles.map(function (item) {
+                return [item.id, item];
+            }));
+            const seleccionados = new Set();
+
+            function crearInputHidden(id) {
+                const hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.name = 'destinatarios[]';
+                hidden.value = String(id);
+                hidden.dataset.destinatarioId = String(id);
+                hiddenContainer.appendChild(hidden);
+            }
+
+            function eliminarInputHidden(id) {
+                const hidden = hiddenContainer.querySelector(`input[data-destinatario-id="${id}"]`);
+                if (hidden) {
+                    hidden.remove();
+                }
+            }
+
+            function crearChip(destinatario) {
+                const chip = document.createElement('span');
+                chip.className = 'badge text-bg-primary d-inline-flex align-items-center gap-2';
+                chip.dataset.destinatarioId = String(destinatario.id);
+                chip.textContent = `${destinatario.name} (${destinatario.role})`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-sm btn-link text-white p-0 border-0 text-decoration-none';
+                removeBtn.style.lineHeight = '1';
+                removeBtn.textContent = '×';
+                removeBtn.setAttribute('aria-label', `Quitar a ${destinatario.name}`);
+                removeBtn.addEventListener('click', function () {
+                    quitarDestinatario(destinatario.id);
+                });
+
+                chip.appendChild(removeBtn);
+                selectedContainer.insertBefore(chip, input);
+            }
+
+            function agregarDestinatario(id) {
+                const destinatario = disponiblesById.get(Number(id));
+
+                if (!destinatario || seleccionados.has(destinatario.id)) {
+                    return;
+                }
+
+                seleccionados.add(destinatario.id);
+                crearChip(destinatario);
+                crearInputHidden(destinatario.id);
+                input.value = '';
+                renderSugerencias();
+            }
+
+            function quitarDestinatario(id) {
+                const destinatarioId = Number(id);
+                seleccionados.delete(destinatarioId);
+                eliminarInputHidden(destinatarioId);
+
+                const chip = selectedContainer.querySelector(`span[data-destinatario-id="${destinatarioId}"]`);
+                if (chip) {
+                    chip.remove();
+                }
+
+                renderSugerencias();
+                input.focus();
+            }
+
+            function obtenerSugerencias() {
+                const termino = input.value.trim().toLowerCase();
+
+                return destinatariosDisponibles.filter(function (item) {
+                    if (seleccionados.has(item.id)) {
+                        return false;
+                    }
+
+                    if (termino === '') {
+                        return true;
+                    }
+
+                    return item.name.toLowerCase().includes(termino)
+                        || item.role.toLowerCase().includes(termino);
+                }).slice(0, 8);
+            }
+
+            function renderSugerencias() {
+                const items = obtenerSugerencias();
+                suggestions.innerHTML = '';
+
+                if (items.length === 0) {
+                    suggestions.classList.add('d-none');
+                    return;
+                }
+
+                items.forEach(function (item) {
+                    const option = document.createElement('button');
+                    option.type = 'button';
+                    option.className = 'list-group-item list-group-item-action';
+                    option.textContent = `${item.name} (${item.role})`;
+                    option.addEventListener('click', function () {
+                        agregarDestinatario(item.id);
+                    });
+                    suggestions.appendChild(option);
+                });
+
+                suggestions.classList.remove('d-none');
+            }
+
+            function agregarPrimeraSugerencia() {
+                const items = obtenerSugerencias();
+                if (items.length === 0) {
+                    return;
+                }
+
+                agregarDestinatario(items[0].id);
+            }
+
+            destinatariosIniciales.forEach(function (id) {
+                if (disponiblesById.has(id)) {
+                    agregarDestinatario(id);
+                }
+            });
+
+            selectedContainer.addEventListener('click', function () {
+                input.focus();
+                renderSugerencias();
+            });
+
+            input.addEventListener('input', renderSugerencias);
+
+            input.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === 'Tab' || event.key === ',') {
+                    if (input.value.trim() !== '' || (event.key === 'Tab' && !suggestions.classList.contains('d-none'))) {
+                        event.preventDefault();
+                        agregarPrimeraSugerencia();
+                    }
+                    return;
+                }
+
+                if (event.key === 'Backspace' && input.value.trim() === '' && seleccionados.size > 0) {
+                    const ultimoId = Array.from(seleccionados).pop();
+                    quitarDestinatario(ultimoId);
+                }
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!composer.contains(event.target)) {
+                    suggestions.classList.add('d-none');
+                }
+            });
+
+            input.addEventListener('focus', renderSugerencias);
+        });
+    </script>
 </x-app-layout>
