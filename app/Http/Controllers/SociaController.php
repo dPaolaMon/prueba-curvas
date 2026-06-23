@@ -47,8 +47,16 @@ class SociaController extends Controller
             });
         }
 
+        $socias = $query->paginate(10)->withQueryString();
+
+        $socias->through(function (Socia $socia) {
+            $socia->edad = $socia->fecha_nacimiento?->age;
+
+            return $socia;
+        });
+
         return view('socias.index', [
-            'socias' => $query->paginate(10)->withQueryString(),
+            'socias' => $socias,
             'search' => $search,
             'sort' => $sort,
             'direction' => $direction,
@@ -128,11 +136,17 @@ class SociaController extends Controller
 
         $data['user_id'] = auth()->id();
 
-        Socia::create($data);
+        $socia = Socia::create($data);
+
+        $loginSocia = (string) ($socia->num_socia ?? $socia->fresh()->num_socia);
 
         return redirect()
             ->route('socias.index')
-            ->with('success', 'Socia registrada correctamente');
+            ->with('success', 'Socia registrada correctamente')
+            ->with('socia_credentials', [
+                'login' => $loginSocia,
+                'password' => 'cambiar',
+            ]);
     }
 
     public function update(StoreSociaRequest $request, Socia $socia)

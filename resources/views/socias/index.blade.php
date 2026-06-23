@@ -31,6 +31,33 @@
                 });
             </script>
         @endif
+
+        @if(session('socia_credentials'))
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    setTimeout(function () {
+                        if (!window.Swal) return;
+
+                        const credentials = @json(session('socia_credentials'));
+
+                        window.Swal.fire({
+                            icon: 'success',
+                            title: 'Socia creada exitosamente',
+                            html: `
+                                <p class="mb-3">Recuerda compartir estas credenciales de acceso con la socia:</p>
+                                <div class="text-start p-3 rounded border bg-body-tertiary">
+                                    <p class="mb-1"><strong>Login (No. de usuaria):</strong> ${credentials.login}</p>
+                                    <p class="mb-0"><strong>Contraseña temporal:</strong> ${credentials.password}</p>
+                                </div>
+                            `,
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd',
+                            allowOutsideClick: false,
+                        });
+                    }, 0);
+                });
+            </script>
+        @endif
         
         <form method="GET" action="{{ route('socias.index') }}" class="row g-2 align-items-end mb-3 justify-content-end">
             <div class="col-12 col-md-6 col-lg-5">
@@ -83,6 +110,7 @@
                                 @endif
                             </a>
                         </th>
+                        <th scope="col">Edad</th>
                         <th scope="col">Celular</th>
                         <th scope="col">Email</th>
                         <th scope="col">Municipio</th>
@@ -130,6 +158,7 @@
                     <tr>
                         <td>{{ $socia->num_socia }}</td>
                         <td>{{ $socia->nombre }} {{ $socia->apellidos }}</td>
+                        <td>{{ $socia->edad !== null ? $socia->edad . ' años' : '—' }}</td>
                         <td>{{ $socia->celular }}</td>
                         <td>{{ $socia->email }}</td>
                         <td>{{ $socia->municipio->nombre ?? '—' }}</td>
@@ -188,7 +217,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="11">
+                        <td colspan="12">
                             <div class="alert alert-secondary mb-0 text-center" role="alert">
                                 No hay socias registradas aún.
                             </div>

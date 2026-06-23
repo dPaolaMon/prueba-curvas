@@ -48,7 +48,7 @@
                     </div>
 
                     <p class="text-muted mb-0">
-                        Bienvenida a tu espacio. Aquí puedes revisar tu membresía, pagos y reservar clases.
+                        Bienvenida a tu espacio. Aquí puedes revisar tu membresía y pagos.
                     </p>
                 </div>
             </div>
@@ -314,6 +314,60 @@
 
             let mesVista = data?.mes ?? null;
             let anioVista = data?.año ?? null;
+            let calendarioDataActual = data;
+            const siluetaDataElement = document.getElementById('kiosko-silueta-data');
+            const siluetaData = siluetaDataElement ? JSON.parse(siluetaDataElement.textContent) : null;
+            const lienzoSilueta = document.getElementById('canvas-silueta');
+
+            const medidasAntData = siluetaData?.anterior ?? { brazos: 0, busto: 0, cintura: 0, abdomen: 0, cadera: 0, muslos: 0, papada: 0 };
+            const medidasActData = siluetaData?.actual ?? { brazos: 26, busto: 83, cintura: 60, abdomen: 58, cadera: 78, muslos: 41, papada: 0 };
+
+            const medidasAnt = new window.kiosko.Medidas(
+                medidasAntData.brazos,
+                medidasAntData.busto,
+                medidasAntData.cintura,
+                medidasAntData.abdomen,
+                medidasAntData.cadera,
+                medidasAntData.muslos,
+                medidasAntData.papada
+            );
+
+            const medidasAct = new window.kiosko.Medidas(
+                medidasActData.brazos,
+                medidasActData.busto,
+                medidasActData.cintura,
+                medidasActData.abdomen,
+                medidasActData.cadera,
+                medidasActData.muslos,
+                medidasActData.papada
+            );
+
+            function renderizarCalendario() {
+                if (!calendarioDataActual) {
+                    return;
+                }
+
+                window.kiosko.ajustarResolucionCanvas('canvas-calendario');
+                window.kiosko.generarCalendarioCanvas('canvas-calendario', calendarioDataActual);
+            }
+
+            function renderizarSilueta() {
+                if (!lienzoSilueta) {
+                    return;
+                }
+
+                const resizeInfo = window.kiosko.ajustarResolucionCanvas('canvas-silueta');
+                const contextoSilueta = lienzoSilueta.getContext('2d');
+
+                const baseAncho = Number(lienzoSilueta.dataset.baseWidth || 605);
+                const baseAlto = Number(lienzoSilueta.dataset.baseHeight || 602);
+                const escalaBase = 2;
+                const factorEscala = Math.min(resizeInfo.width / baseAncho, resizeInfo.height / baseAlto);
+                const escalaSilueta = Math.max(0.7, escalaBase * factorEscala);
+
+                contextoSilueta.clearRect(0, 0, resizeInfo.width, resizeInfo.height);
+                window.kiosko.dibujaMujer(contextoSilueta, escalaSilueta, medidasAnt, medidasAct);
+            }
 
             function normalizarMesAnio(mes, anio) {
                 if (mes < 1) {
@@ -332,7 +386,8 @@
                     return;
                 }
 
-                window.kiosko.generarCalendarioCanvas('canvas-calendario', payload.kioskoCalData);
+                calendarioDataActual = payload.kioskoCalData;
+                renderizarCalendario();
 
                 if (tituloMesElement && payload.mesCalendarioTitulo) {
                     tituloMesElement.textContent = payload.mesCalendarioTitulo;
@@ -393,9 +448,19 @@
             }
 
             if (data) {
-                window.kiosko.ajustarResolucionCanvas('canvas-calendario');
-                window.kiosko.generarCalendarioCanvas('canvas-calendario', data);
+                renderizarCalendario();
             }
+
+            renderizarSilueta();
+
+            let resizeTimer;
+            window.addEventListener('resize', function () {
+                window.clearTimeout(resizeTimer);
+                resizeTimer = window.setTimeout(function () {
+                    renderizarCalendario();
+                    renderizarSilueta();
+                }, 120);
+            });
 
             btnMesAnterior?.addEventListener('click', function () {
                 cargarMes(-1);
@@ -405,44 +470,6 @@
                 cargarMes(1);
             });
 
-            const siluetaDataElement = document.getElementById('kiosko-silueta-data');
-            const siluetaData = siluetaDataElement ? JSON.parse(siluetaDataElement.textContent) : null;
-
-            let lienzo = document.getElementById("canvas-silueta");
-
-            if (!lienzo) {
-                return;
-            }
-
-            let contexto = lienzo.getContext("2d");
-
-            const medidasAntData = siluetaData?.anterior ?? { brazos: 0, busto: 0, cintura: 0, abdomen: 0, cadera: 0, muslos: 0, papada: 0 };
-            const medidasActData = siluetaData?.actual ?? { brazos: 26, busto: 83, cintura: 60, abdomen: 58, cadera: 78, muslos: 41, papada: 0 };
-
-            let medidasAnt = new window.kiosko.Medidas(
-                medidasAntData.brazos,
-                medidasAntData.busto,
-                medidasAntData.cintura,
-                medidasAntData.abdomen,
-                medidasAntData.cadera,
-                medidasAntData.muslos,
-                medidasAntData.papada
-            );
-
-            let medidasAct = new window.kiosko.Medidas(
-                medidasActData.brazos,
-                medidasActData.busto,
-                medidasActData.cintura,
-                medidasActData.abdomen,
-                medidasActData.cadera,
-                medidasActData.muslos,
-                medidasActData.papada
-            );
-
-
-            
-            window.kiosko.dibujaMujer(contexto, 2, medidasAnt, medidasAct);
-            
         });
     </script>
 </x-subapp-layout>

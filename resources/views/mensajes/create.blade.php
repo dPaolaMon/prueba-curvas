@@ -49,9 +49,38 @@
 
                             {{-- Destinatarios --}}
                             <div class="mb-3">
-                                <label for="destinatarios" class="form-label fw-semibold">
-                                    Para <span class="text-danger">*</span>
-                                </label>
+                                <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                    <label for="destinatarios" class="form-label fw-semibold mb-0">
+                                        Para <span class="text-danger">*</span>
+                                    </label>
+                                    <div class="d-flex gap-1">
+                                        {{-- Botón Limpiar (visible para todos) --}}
+                                        <button type="button" class="btn btn-sm btn-outline-secondary" id="btnLimpiar" title="Limpiar selección">
+                                            ✕
+                                        </button>
+                                        
+                                        {{-- Botón Todas las Socias (visible para ENTRENADORA, GERENTE, ADMINISTRADOR) --}}
+                                        @if (in_array(strtoupper($usuario->role), ['ENTRENADORA', 'GERENTE', 'ADMINISTRADOR']))
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnSocias">
+                                                Todas las Socias
+                                            </button>
+                                        @endif
+                                        
+                                        {{-- Botón Todos los Entrenadores (visible para GERENTE, ADMINISTRADOR) --}}
+                                        @if (in_array(strtoupper($usuario->role), ['GERENTE', 'ADMINISTRADOR']))
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnEntrenadores">
+                                                Todos los Entrenadores
+                                            </button>
+                                        @endif
+                                        
+                                        {{-- Botón Todos los Gerentes (visible para ADMINISTRADOR) --}}
+                                        @if (strtoupper($usuario->role) === 'ADMINISTRADOR')
+                                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnGerentes">
+                                                Todos los Gerentes
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
                                 <div id="destinatariosComposer" class="position-relative">
                                     <div id="destinatariosSelected" class="form-control d-flex flex-wrap gap-2 align-items-center py-2" style="min-height: 46px;">
                                         <input
@@ -290,6 +319,59 @@
             });
 
             input.addEventListener('focus', renderSugerencias);
+
+            // Funciones para botones de filtrado por rol
+            function agregarTodosPorRol(rol) {
+                const usuariosPorRol = destinatariosDisponibles.filter(function (item) {
+                    return item.role.toUpperCase() === rol.toUpperCase();
+                });
+
+                usuariosPorRol.forEach(function (item) {
+                    if (!seleccionados.has(item.id)) {
+                        agregarDestinatario(item.id);
+                    }
+                });
+            }
+
+            function limpiarSeleccion() {
+                Array.from(seleccionados).forEach(function (id) {
+                    quitarDestinatario(id);
+                });
+            }
+
+            // Event listeners para botones
+            const btnLimpiar = document.getElementById('btnLimpiar');
+            const btnSocias = document.getElementById('btnSocias');
+            const btnEntrenadores = document.getElementById('btnEntrenadores');
+            const btnGerentes = document.getElementById('btnGerentes');
+
+            if (btnLimpiar) {
+                btnLimpiar.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    limpiarSeleccion();
+                });
+            }
+
+            if (btnSocias) {
+                btnSocias.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    agregarTodosPorRol('Socia');
+                });
+            }
+
+            if (btnEntrenadores) {
+                btnEntrenadores.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    agregarTodosPorRol('Entrenadora');
+                });
+            }
+
+            if (btnGerentes) {
+                btnGerentes.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    agregarTodosPorRol('Gerente');
+                });
+            }
         });
     </script>
 </x-app-layout>

@@ -25,7 +25,7 @@ class SociaObserver
             'username' => $username,
             'email' => $email,
             'password' => Hash::make('cambiar'), // Contraseña fija
-            'role' => 'socia',
+            'role' => 'Socia',
         ]);
 
         // Asignar el user_id a la socia

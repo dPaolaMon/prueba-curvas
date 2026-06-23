@@ -127,19 +127,16 @@
         document.addEventListener('DOMContentLoaded', function () {
             const siluetaDataElement = document.getElementById('kiosko-silueta-data');
             const siluetaData = siluetaDataElement ? JSON.parse(siluetaDataElement.textContent) : null;
+            const lienzoSilueta = document.getElementById("canvas-silueta");
 
-            let lienzo = document.getElementById("canvas-silueta");
-
-            if (!lienzo) {
+            if (!lienzoSilueta) {
                 return;
             }
-
-            let contexto = lienzo.getContext("2d");
 
             const medidasAntData = siluetaData?.anterior ?? { brazos: 0, busto: 0, cintura: 0, abdomen: 0, cadera: 0, muslos: 0, papada: 0 };
             const medidasActData = siluetaData?.actual ?? { brazos: 26, busto: 83, cintura: 60, abdomen: 58, cadera: 78, muslos: 41, papada: 0 };
 
-            let medidasAnt = new window.kiosko.Medidas(
+            const medidasAnt = new window.kiosko.Medidas(
                 medidasAntData.brazos,
                 medidasAntData.busto,
                 medidasAntData.cintura,
@@ -149,7 +146,7 @@
                 medidasAntData.papada
             );
 
-            let medidasAct = new window.kiosko.Medidas(
+            const medidasAct = new window.kiosko.Medidas(
                 medidasActData.brazos,
                 medidasActData.busto,
                 medidasActData.cintura,
@@ -159,7 +156,30 @@
                 medidasActData.papada
             );
 
-            window.kiosko.dibujaMujer(contexto, 2, medidasAnt, medidasAct);
+            function renderizarSilueta() {
+                const resizeInfo = window.kiosko.ajustarResolucionCanvas('canvas-silueta');
+
+                const contextoSilueta = lienzoSilueta.getContext('2d');
+
+                const baseAncho = Number(lienzoSilueta.dataset.baseWidth || 605);
+                const baseAlto = Number(lienzoSilueta.dataset.baseHeight || 602);
+                const escalaBase = 2;
+                const factorEscala = Math.min(resizeInfo.width / baseAncho, resizeInfo.height / baseAlto);
+                const escalaSilueta = Math.max(0.7, escalaBase * factorEscala);
+
+                contextoSilueta.clearRect(0, 0, resizeInfo.width, resizeInfo.height);
+                window.kiosko.dibujaMujer(contextoSilueta, escalaSilueta, medidasAnt, medidasAct);
+            }
+
+            renderizarSilueta();
+
+            let resizeTimer;
+            window.addEventListener('resize', function () {
+                window.clearTimeout(resizeTimer);
+                resizeTimer = window.setTimeout(function () {
+                    renderizarSilueta();
+                }, 120);
+            });
         });
     </script>
 </x-app-layout>

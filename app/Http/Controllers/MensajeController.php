@@ -65,7 +65,7 @@ class MensajeController extends Controller
             ->orderBy('name')
             ->get(['id', 'name', 'role']);
 
-        return view('mensajes.create', compact('destinatariosDisponibles'));
+        return view('mensajes.create', compact('usuario', 'destinatariosDisponibles'));
     }
 
     /**

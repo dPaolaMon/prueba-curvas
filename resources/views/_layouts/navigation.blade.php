@@ -182,15 +182,15 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="{{ route('maquinas.index') }}">{{ __('Máquinas') }}</a>
+                            <a class="dropdown-item" href="#">{{ __('Opción 1') }}</a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('ejercicios.index') }}">{{ __('Ejercicios') }}</a>
+                            <a class="dropdown-item" href="#">{{ __('Opción 2') }}</a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item" href="{{ route('calendario.index') }}">{{ __('Calendario') }}</a>
+                            <a class="dropdown-item" href="#">{{ __('Opción 3') }}</a>
                         </li>
                     </ul>
                 </li>
@@ -207,7 +207,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" href="{{ route('maquinas.index') }}">{{ __('Asistencia') }}</a>
+                            <a class="dropdown-item" href="#">{{ __('Opción 1') }}</a>
                         </li>
                     </ul>
                 </li>

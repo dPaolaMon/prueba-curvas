@@ -82,6 +82,18 @@
                        required>
             </div>
 
+            {{-- Edad --}}
+            <div class="col-12 col-md-6 col-lg-4">
+                <label for="edad_calculada" class="form-label">Edad (años)</label>
+                <input
+                    type="text"
+                    id="edad_calculada"
+                    class="form-control"
+                    value="{{ optional($socia->fecha_nacimiento)->age }}"
+                    readonly
+                >
+            </div>
+
             {{-- Estado Civil --}}
             <div class="col-12 col-md-6 col-lg-4">
                 <label for="estado_civil" class="form-label">Estado Civil</label>
@@ -294,7 +306,51 @@
         }
     }
 
+    function calcularEdad(fechaNacimiento) {
+        if (!fechaNacimiento) {
+            return '';
+        }
+
+        const hoy = new Date();
+        const fecha = new Date(fechaNacimiento + 'T00:00:00');
+
+        if (Number.isNaN(fecha.getTime()) || fecha > hoy) {
+            return '';
+        }
+
+        let edad = hoy.getFullYear() - fecha.getFullYear();
+        const mesActual = hoy.getMonth();
+        const diaActual = hoy.getDate();
+        const mesNacimiento = fecha.getMonth();
+        const diaNacimiento = fecha.getDate();
+
+        if (mesActual < mesNacimiento || (mesActual === mesNacimiento && diaActual < diaNacimiento)) {
+            edad--;
+        }
+
+        return edad >= 0 ? String(edad) : '';
+    }
+
+    function actualizarEdad() {
+        const inputFechaNacimiento = document.getElementById('fecha_nacimiento');
+        const inputEdad = document.getElementById('edad_calculada');
+
+        if (!inputFechaNacimiento || !inputEdad) {
+            return;
+        }
+
+        inputEdad.value = calcularEdad(inputFechaNacimiento.value);
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         actualizarMunicipios();
+
+        const inputFechaNacimiento = document.getElementById('fecha_nacimiento');
+        if (inputFechaNacimiento) {
+            inputFechaNacimiento.addEventListener('change', actualizarEdad);
+            inputFechaNacimiento.addEventListener('input', actualizarEdad);
+        }
+
+        actualizarEdad();
     });
 </script>

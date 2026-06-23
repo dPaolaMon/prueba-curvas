@@ -134,6 +134,16 @@ class KioskoController extends Controller
             ];
         })->values();
 
+        $imcActual = $this->calcularImc($medidaActual?->peso, $medidaActual?->altura);
+        $imcAnterior = $this->calcularImc($medidaAnterior?->peso, $medidaAnterior?->altura);
+        $resumenMedidas->push([
+            'label' => 'IMC',
+            'unidad' => 'kg/m2',
+            'actual' => $imcActual,
+            'anterior' => $imcAnterior,
+            'diferencia' => is_null($imcActual) || is_null($imcAnterior) ? null : round($imcActual - $imcAnterior, 2),
+        ]);
+
         $cmPerdidos = 0.0;
         $pesoPerdido = null;
 
@@ -469,6 +479,20 @@ class KioskoController extends Controller
             'mesCalendarioTitulo' => Str::ucfirst($fechaBase->copy()->locale('es')->translatedFormat('F Y')),
             'asistenciasMesTotal' => $asistenciasMes->count(),
         ];
+    }
+
+    private function calcularImc($peso, $alturaCm): ?float
+    {
+        if (is_null($peso) || is_null($alturaCm)) {
+            return null;
+        }
+
+        $alturaMetros = (float) $alturaCm / 100;
+        if ($alturaMetros <= 0) {
+            return null;
+        }
+
+        return round((float) $peso / ($alturaMetros * $alturaMetros), 2);
     }
 
 

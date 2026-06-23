@@ -157,6 +157,16 @@
 
             let mesVista = data?.mes ?? null;
             let anioVista = data?.año ?? null;
+            let calendarioDataActual = data;
+
+            function renderizarCalendario() {
+                if (!calendarioDataActual) {
+                    return;
+                }
+
+                window.kiosko.ajustarResolucionCanvas('canvas-calendario');
+                window.kiosko.generarCalendarioCanvas('canvas-calendario', calendarioDataActual);
+            }
 
             function normalizarMesAnio(mes, anio) {
                 if (mes < 1) {
@@ -175,7 +185,8 @@
                     return;
                 }
 
-                window.kiosko.generarCalendarioCanvas('canvas-calendario', payload.kioskoCalData);
+                calendarioDataActual = payload.kioskoCalData;
+                renderizarCalendario();
 
                 if (tituloMesElement && payload.mesCalendarioTitulo) {
                     tituloMesElement.textContent = payload.mesCalendarioTitulo;
@@ -234,9 +245,16 @@
             }
 
             if (data) {
-                window.kiosko.ajustarResolucionCanvas('canvas-calendario');
-                window.kiosko.generarCalendarioCanvas('canvas-calendario', data);
+                renderizarCalendario();
             }
+
+            let resizeTimer;
+            window.addEventListener('resize', function () {
+                window.clearTimeout(resizeTimer);
+                resizeTimer = window.setTimeout(function () {
+                    renderizarCalendario();
+                }, 120);
+            });
 
             btnMesAnterior?.addEventListener('click', function () {
                 cargarMes(-1);

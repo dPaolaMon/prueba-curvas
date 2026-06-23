@@ -251,11 +251,11 @@ const MAPA_CORPORAL_SILUETA = {
         { id: 36, lado: -1, fuerza: 0.7 }, { id: 101, lado: 1, fuerza: 0.7 }
     ],
     cintura: [
-        { id: 37, lado: -1, fuerza: 0.5 }, { id: 100, lado: 1, fuerza: 0.5 },  // Apoyo
-        { id: 38, lado: -1, fuerza: 1 },   { id: 99, lado: 1, fuerza: 1 }      // Principal
+        { id: 37, lado: -1, fuerza: 0.25 }, { id: 100, lado: 1, fuerza: 0.25 },    // Apoyo
+        { id: 38, lado: -1, fuerza: 0.5 },   { id: 99, lado: 1, fuerza: 0.5 }      // Principal
     ],
     abdomen: [
-        { id: 39, lado: -1, fuerza: 0.2 }, { id: 98, lado: 1, fuerza: 0.2 }
+        { id: 39, lado: -1, fuerza: 0.5 }, { id: 98, lado: 1, fuerza: 0.5 }
     ],
     cadera: [
         { id: 40, lado: -1, fuerza: 1 }, { id: 97, lado: 1, fuerza: 1 },
@@ -274,7 +274,7 @@ const MAPA_CORPORAL_SILUETA = {
 
 const MAPA_CORPORAL_TANGA = {
     abdomen: [
-        { id: 1, lado: -1, fuerza: 0.2 }, { id: 6, lado: 1, fuerza: 0.2 }
+        { id: 1, lado: -1, fuerza: 0.5 }, { id: 6, lado: 1, fuerza: 0.5 }
     ],
     cadera: [
         { id: 2, lado: -1, fuerza: 1 }, { id: 5, lado: 1, fuerza: 1 },
@@ -370,13 +370,28 @@ function actualizaVertices( niveles ) {
 	pMuslos = {x0:tSilueta[95].fin.x, y0:tSilueta[95].fin.y, x1:(tSilueta[70].fin.x + tSilueta[71].fin.x)/2, y1:tSilueta[95].fin.y};
 }
 
+function obtenerTamanoLogicoCanvas(contexto) {
+	const transform = typeof contexto.getTransform === 'function' ? contexto.getTransform() : null;
+	const ratioX = transform && transform.a ? Math.abs(transform.a) : 1;
+	const ratioY = transform && transform.d ? Math.abs(transform.d) : 1;
+
+	return {
+		width: contexto.canvas.width / (ratioX || 1),
+		height: contexto.canvas.height / (ratioY || 1),
+	};
+}
+
 function dibujaSilueta(contexto, escala) {
+	const canvasLogico = obtenerTamanoLogicoCanvas(contexto);
 	//Obtener el centro relativo del modelo respecto al canvas
-	const inicioSilueta = {x: contexto.canvas.width/2 - tamanioMujer.ancho*escala/2, y: contexto.canvas.height/2 - tamanioMujer.alto*escala/2};
+	const inicioSilueta = {
+		x: canvasLogico.width/2 - tamanioMujer.ancho*escala/2,
+		y: canvasLogico.height/2 - tamanioMujer.alto*escala/2
+	};
 	
-    contexto.clearRect(0, 0, contexto.canvas.width, contexto.canvas.height);
+    contexto.clearRect(0, 0, canvasLogico.width, canvasLogico.height);
     contexto.fillStyle = "#FDF5E6";
-    contexto.fillRect(0, 0, contexto.canvas.width, contexto.canvas.height);
+    contexto.fillRect(0, 0, canvasLogico.width, canvasLogico.height);
     contexto.save();
     contexto.translate(inicioSilueta.x, inicioSilueta.y); // Centrar en el canvas
     contexto.scale(escala, escala);
@@ -425,8 +440,12 @@ export class Medidas {
 }
 
 function dibujarLineaConTexto(contexto, escala, x1, y1, x2, y2, texto, posicionTexto, colorLinea, colorTexto, margenes) {
+	const canvasLogico = obtenerTamanoLogicoCanvas(contexto);
 	//Obtener el centro relativo del modelo respecto al canvas
-	const inicioSilueta = {x: contexto.canvas.width/2 - tamanioMujer.ancho*escala/2, y: contexto.canvas.height/2 - tamanioMujer.alto*escala/2};
+	const inicioSilueta = {
+		x: canvasLogico.width/2 - tamanioMujer.ancho*escala/2,
+		y: canvasLogico.height/2 - tamanioMujer.alto*escala/2
+	};
 	
 	contexto.save(); // Guarda el estado actual del canvas
 	contexto.translate(inicioSilueta.x, inicioSilueta.y); // Centrar en el canvas
@@ -542,6 +561,7 @@ export function dibujaMujer (contexto, escala, mAnterior, mActual) {
 }
 
 function dibujaLeyendas(contexto, escala, colorDisminuyo, colorAumento, colorMantuvo) {
+	const canvasLogico = obtenerTamanoLogicoCanvas(contexto);
 	const leyendas = [
 	  { texto: "Aumentó", color: colorAumento },
 	  { texto: "Se mantuvo", color: colorMantuvo },
@@ -557,7 +577,7 @@ function dibujaLeyendas(contexto, escala, colorDisminuyo, colorAumento, colorMan
 	// Calcular la posición inicial (Y) para que quede abajo
 	// Sumamos el alto de todos los cuadros y sus espacios
 	const altoTotal = (tamañoCuadro * leyendas.length) + (espacioEntreFilas * (leyendas.length - 1));
-	let startY = contexto.canvas.height/escala - altoTotal - margenInferior;
+	let startY = canvasLogico.height/escala - altoTotal - margenInferior;
 
 	contexto.save(); // Guarda el estado actual del canvas
     contexto.scale(escala, escala);
