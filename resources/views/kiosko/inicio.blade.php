@@ -438,7 +438,7 @@
                             icon: 'error',
                             title: error.message || 'Error al cargar calendario',
                             showConfirmButton: false,
-                            timer: 2200,
+                            showCloseButton: true,
                         });
                     }
                 } finally {

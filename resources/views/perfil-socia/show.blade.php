@@ -169,7 +169,9 @@
                 </div>
 
                 <div class="d-flex justify-content-end pt-4 border-top mt-4">
-                    <a href="{{ route('perfil-socia.edit') }}" class="btn btn-primary">Editar</a>
+                    <a href="{{ route('perfil-socia.edit') }}" class="btn btn-primary">
+                        <i class="bi bi-pencil me-2"></i>Editar
+                    </a>
                 </div>
             </div>
         </div>

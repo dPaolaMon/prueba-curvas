@@ -41,7 +41,9 @@
                     </div>
 
                     <div class="card-footer d-flex gap-2 justify-content-between">
-                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">Regresar</a>
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary btn-sm">
+                            <i class="bi bi-arrow-left me-2"></i>Regresar
+                        </a>
 
                         <div class="d-flex gap-2">
                             @if($esDestinatario)
@@ -50,7 +52,7 @@
                                     class="btn btn-outline-danger btn-sm js-eliminar-entrada"
                                     data-url="{{ route('mensajes.destroy-entrada', $mensaje) }}"
                                 >
-                                    Eliminar de entrada
+                                    <i class="bi bi-trash me-2"></i>Eliminar de entrada
                                 </button>
                             @endif
 
@@ -60,11 +62,13 @@
                                     class="btn btn-outline-danger btn-sm js-eliminar-enviado"
                                     data-url="{{ route('mensajes.destroy-enviados', $mensaje) }}"
                                 >
-                                    Eliminar de enviados
+                                    <i class="bi bi-trash me-2"></i>Eliminar de enviados
                                 </button>
                             @endif
 
-                            <a href="{{ route('mensajes.create') }}" class="btn btn-primary btn-sm">Redactar nuevo</a>
+                            <a href="{{ route('mensajes.create') }}" class="btn btn-primary btn-sm">
+                                <i class="bi bi-pencil-square me-2"></i>Redactar nuevo
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -45,16 +45,29 @@
                     </p>
 
                     @if (session('status') === 'verification-link-sent')
-                        <div class="alert alert-success py-2 small mt-2" role="alert">
-                            {{ __('Se ha enviado un nuevo enlace de verificación a su dirección de correo electrónico.') }}
-                        </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function () {
+                                if (!window.Swal) return;
+
+                                window.Swal.fire({
+                                    toast: true,
+                                    theme: 'auto',
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: @js(__('Se ha enviado un nuevo enlace de verificación a su dirección de correo electrónico.')),
+                                    showConfirmButton: false,
+                                    timer: 2200,
+                                    timerProgressBar: true,
+                                });
+                            });
+                        </script>
                     @endif
                 </div>
             @endif
         </div>
 
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">{{ __('Guardar Información') }}</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-2"></i>{{ __('Guardar Información') }}</button>
         </div>
     </form>
 

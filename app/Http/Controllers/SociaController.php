@@ -144,6 +144,7 @@ class SociaController extends Controller
             ->route('socias.index')
             ->with('success', 'Socia registrada correctamente')
             ->with('socia_credentials', [
+                'socia_id' => $socia->id,
                 'login' => $loginSocia,
                 'password' => 'cambiar',
             ]);

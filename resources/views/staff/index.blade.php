@@ -40,8 +40,7 @@
                         icon: 'error',
                         title: @js(session('error')),
                         showConfirmButton: false,
-                        timer: 2600,
-                        timerProgressBar: true,
+                        showCloseButton: true,
                     });
                 });
             </script>
@@ -61,11 +60,17 @@
             </div>
 
             <div class="col-12 col-md-auto d-flex gap-2">
-                <button type="submit" class="btn btn-secondary">Buscar</button>
+                <button type="submit" class="btn btn-secondary">
+                    <i class="bi bi-search me-2"></i>Buscar
+                </button>
                 @if(!empty($search))
-                    <a href="{{ route('usuarios.index') }}" class="btn btn-outline-secondary">Limpiar</a>
+                    <a href="{{ route('usuarios.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                    </a>
                 @endif
-                <a href="{{ route('usuarios.create') }}" class="btn btn-primary">Agregar Usuario</a>
+                <a href="{{ route('usuarios.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Agregar Usuario
+                </a>
             </div>
         </form>
 

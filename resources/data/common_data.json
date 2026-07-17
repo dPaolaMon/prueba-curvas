@@ -30,6 +30,12 @@
     { "value": "pink", "es": "Rosa", "en": "Pink" },
     { "value": "purple", "es": "Púrpura", "en": "Purple" },
     { "value": "mint", "es": "Menta", "en": "Mint" }
+  ],
+  "estatus_membresia": [
+    "Activa",
+    "Pausada",
+    "Vencida",
+    "Cancelada"
   ]
 }
 

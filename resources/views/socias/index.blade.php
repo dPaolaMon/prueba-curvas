@@ -50,9 +50,20 @@
                                     <p class="mb-0"><strong>Contraseña temporal:</strong> ${credentials.password}</p>
                                 </div>
                             `,
+                            showDenyButton: true,
+                            denyButtonText: 'Registrar Membresía',
                             confirmButtonText: 'Entendido',
                             confirmButtonColor: getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd',
+                            denyButtonColor: '#f59e0b',
                             allowOutsideClick: false,
+                        }).then((result) => {
+                            if (!result.isDenied || !credentials.socia_id) {
+                                return;
+                            }
+
+                            const membresiaUrl = new URL(@js(route('membresias.create')), window.location.origin);
+                            membresiaUrl.searchParams.set('socia_id', credentials.socia_id);
+                            window.location.assign(membresiaUrl.toString());
                         });
                     }, 0);
                 });
@@ -73,13 +84,19 @@
             </div>
 
             <div class="col-12 col-md-auto d-flex gap-2">
-                <button type="submit" class="btn btn-secondary">Buscar</button>
+                <button type="submit" class="btn btn-secondary">
+                    <i class="bi bi-search me-2"></i>Buscar
+                </button>
 
                 @if(!empty($search))
-                    <a href="{{ route('socias.index') }}" class="btn btn-outline-secondary">Limpiar</a>
+                    <a href="{{ route('socias.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                    </a>
                 @endif
 
-                <a href="{{ route('socias.create') }}" class="btn btn-primary">Registro Nueva Socia</a>
+                <a href="{{ route('socias.create') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Registro Nueva Socia
+                </a>
 
             </div>
         </form>

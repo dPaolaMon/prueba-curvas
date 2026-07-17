@@ -19,11 +19,17 @@
             </div>
 
             <div class="d-flex gap-2 flex-wrap">
-                <a href="{{ route('medidas.create', ['socia_id' => $socia->id, 'return_to' => request()->fullUrl()]) }}" class="btn btn-primary">Nueva Medida</a>
+                <a href="{{ route('medidas.create', ['socia_id' => $socia->id, 'return_to' => request()->fullUrl()]) }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-2"></i>Nueva Medida
+                </a>
                 @if($medidas->isNotEmpty())
-                    <a href="{{ route('medidas.historial.export', $socia) }}" class="btn btn-outline-secondary">Exportar CSV</a>
+                    <a href="{{ route('medidas.historial.export', $socia) }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-download me-2"></i>Exportar CSV
+                    </a>
                 @endif
-                <a href="{{ route('medidas.index') }}" class="btn btn-outline-secondary">Volver al listado</a>
+                <a href="{{ route('medidas.index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>Volver al listado
+                </a>
             </div>
         </div>
 

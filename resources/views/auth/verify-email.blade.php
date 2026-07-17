@@ -4,9 +4,22 @@
     </div>
 
     @if (session('status') == 'verification-link-sent')
-        <div class="alert alert-success" role="alert">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!window.Swal) return;
+
+                window.Swal.fire({
+                    toast: true,
+                    theme: 'auto',
+                    position: 'top-end',
+                    icon: 'success',
+                    title: @js(__('A new verification link has been sent to the email address you provided during registration.')),
+                    showConfirmButton: false,
+                    timer: 2200,
+                    timerProgressBar: true,
+                });
+            });
+        </script>
     @endif
 
     <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">

@@ -5,8 +5,8 @@
 
     <x-slot name="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('medidas.index') }}" class="link-underline-opacity-0 link-body-emphasis">{{ __('Gestión de Medidas') }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('medidas.index') }}" class="link-underline-opacity-0 link-body-emphasis">{{ __('Listado') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('socias.index') }}" class="link-underline-opacity-0 link-body-emphasis">{{ __('Gestión de Socias') }}</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('medidas.index') }}" class="link-underline-opacity-0 link-body-emphasis">{{ __('Medidas') }}</a></li>
             <li class="breadcrumb-item">{{ __('Registro') }}</li>
         </ol>
     </x-slot>

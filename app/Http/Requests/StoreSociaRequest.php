@@ -50,7 +50,6 @@ class StoreSociaRequest extends FormRequest
             'municipio_id' => ['required', 'exists:municipios,id'],
             'estado_id' => ['required', 'exists:estados,id'],
 
-            'metodo_pago' => ['required', 'string', 'max:32'],
             'fecha_alta' => ['required', 'date'],
             'fecha_reingreso' => ['required', 'date'],
 

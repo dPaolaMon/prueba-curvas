@@ -8,17 +8,7 @@
     @csrf
     @method('PUT')
 
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Errores en el formulario:</h6>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    @endif
+    @include('_partials.swal-form-errors')
 
     <div class="row g-4">
         <div class="col-12 col-lg-3">
@@ -184,8 +174,12 @@
     </div>
 
     <div class="d-flex gap-2 justify-content-end pt-4 border-top mt-4">
-        <a href="{{ route('perfil-socia.show') }}" class="btn btn-secondary">Cancelar</a>
-        <button type="submit" class="btn btn-primary">Guardar cambios</button>
+        <a href="{{ route('perfil-socia.show') }}" class="btn btn-secondary">
+            <i class="bi bi-x-circle me-2"></i>Cancelar
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-2"></i>Guardar cambios
+        </button>
     </div>
 </div>
 

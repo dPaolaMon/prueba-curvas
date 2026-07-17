@@ -40,15 +40,16 @@
                         icon: 'error',
                         title: @js(session('error')),
                         showConfirmButton: false,
-                        timer: 2600,
-                        timerProgressBar: true,
+                        showCloseButton: true,
                     });
                 });
             </script>
         @endif
 
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ route('ejercicios.create') }}" class="btn btn-primary">Nuevo Ejercicio</a>
+            <a href="{{ route('ejercicios.create') }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Nuevo Ejercicio
+            </a>
         </div>
 
         <div class="table-responsive">

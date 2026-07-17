@@ -223,23 +223,26 @@
                 },
                 body: JSON.stringify({ num_socia: num })
             })
-            .then(response => response.json())
+            .then(async (response) => {
+                if (response.status === 419) {
+                    const error419 = new Error('La sesión cambió y la pantalla del kiosko necesita recargarse.');
+                    error419.code = 419;
+                    throw error419;
+                }
+
+                const contentType = response.headers.get('content-type') || '';
+                const data = contentType.includes('application/json')
+                    ? await response.json()
+                    : null;
+
+                if (!response.ok) {
+                    throw new Error(data?.error || data?.message || 'No se pudo buscar la socia.');
+                }
+
+                return data;
+            })
             .then(data => {
                 //setTecladoHabilitado(true);
-
-                if (data.error) {
-                    mostrarEstado('espera');
-                    window.Swal.fire({
-                        icon: 'error',
-                        title: 'Socia no encontrada',
-                        text: data.error,
-                        confirmButtonText: 'Intentar de nuevo',
-                        confirmButtonColor: getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd',
-                    });
-                    inputSocia.value = '';
-                    setTecladoHabilitado(true);
-                    return;
-                }
 
                 // Mostrar datos de la socia
                 mostrarEstado('socia');
@@ -271,13 +274,28 @@
                     window.location.href = redirectUrl.toString();
                 }, 4000);
             })
-            .catch(() => {
+            .catch((error) => {
+                if (error?.code === 419) {
+                    mostrarEstado('espera');
+                    setTecladoHabilitado(true);
+                    window.Swal.fire({
+                        icon: 'info',
+                        title: 'Actualizando kiosko',
+                        text: 'Se detectó un cambio de sesión. Se recargará automáticamente.',
+                        confirmButtonText: 'Aceptar',
+                        confirmButtonColor: getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd',
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                    return;
+                }
+
                 setTecladoHabilitado(true);
                 mostrarEstado('espera');
                 window.Swal.fire({
                     icon: 'error',
-                    title: 'Error de conexión',
-                    text: 'No se pudo conectar con el servidor. Intenta nuevamente.',
+                    title: 'No se pudo completar la búsqueda',
+                    text: error?.message || 'No se pudo conectar con el servidor. Intenta nuevamente.',
                     confirmButtonText: 'Aceptar',
                     confirmButtonColor: getComputedStyle(document.body).getPropertyValue('--theme-color').trim() || '#0d6efd',
                 });

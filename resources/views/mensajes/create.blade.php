@@ -32,17 +32,7 @@
                 <div class="card shadow-sm">
                     <div class="card-body p-4">
 
-                        @if ($errors->any())
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <h6 class="alert-heading">Errores en el formulario:</h6>
-                                <ul class="mb-0">
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-                            </div>
-                        @endif
+                        @include('_partials.swal-form-errors')
 
                         <form method="POST" action="{{ route('mensajes.store') }}">
                             @csrf
@@ -140,8 +130,12 @@
                             </div>
 
                             <div class="d-flex gap-2 justify-content-end pt-3 border-top">
-                                <a href="{{ route('mensajes.index') }}" class="btn btn-secondary">Cancelar</a>
-                                <button type="submit" class="btn btn-primary">Enviar mensaje</button>
+                                <a href="{{ route('mensajes.index') }}" class="btn btn-secondary">
+                                    <i class="bi bi-x-circle me-2"></i>Cancelar
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send me-2"></i>Enviar mensaje
+                                </button>
                             </div>
                         </form>
 

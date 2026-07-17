@@ -4,9 +4,22 @@
     </div>
 
     @if (session('status'))
-        <div class="alert alert-success py-2" role="alert">
-            {{ session('status') }}
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                if (!window.Swal) return;
+
+                window.Swal.fire({
+                    toast: true,
+                    theme: 'auto',
+                    position: 'top-end',
+                    icon: 'success',
+                    title: @js(session('status')),
+                    showConfirmButton: false,
+                    timer: 2200,
+                    timerProgressBar: true,
+                });
+            });
+        </script>
     @endif
 
     <form method="POST" action="{{ route('password.email') }}">

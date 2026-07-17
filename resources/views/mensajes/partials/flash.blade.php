@@ -29,8 +29,7 @@
                 icon: 'error',
                 title: @js(session('error')),
                 showConfirmButton: false,
-                timer: 2600,
-                timerProgressBar: true,
+                showCloseButton: true,
             });
         });
     </script>

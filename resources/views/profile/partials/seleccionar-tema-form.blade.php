@@ -31,7 +31,7 @@
         @enderror
 
         <div class="d-flex justify-content-end">
-            <button id="btn-cambiar-tema" type="button" class="btn btn-primary">{{ __('Guardar Tema') }}</button>
+            <button id="btn-cambiar-tema" type="button" class="btn btn-primary"><i class="bi bi-check-circle me-2"></i>{{ __('Guardar Tema') }}</button>
         </div>
     </form>
 

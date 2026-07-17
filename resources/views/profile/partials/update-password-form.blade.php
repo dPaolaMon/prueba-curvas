@@ -33,7 +33,7 @@
         </div>
 
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-primary">{{ __('Guardar Contraseña') }}</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle me-2"></i>{{ __('Guardar Contraseña') }}</button>
         </div>
     </form>
 

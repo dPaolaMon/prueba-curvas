@@ -12,6 +12,25 @@
     </x-slot>
 
     <div class="container py-4">
+
+        <!-- Botones de acción generales -->
+        <div class="row g-2 align-items-end mb-3 justify-content-end">
+          <div class="col-12 col-md-auto d-flex gap-2">
+            <a href="{{ route('socias.index') }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Listado de Socias
+            </a>
+            <a href="{{ route('socias.edit', $socia) }}" class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-2"></i>Editar
+            </a>
+            <a href="{{ route('membresias.create', ['socia_id' => $socia->id]) }}" class="btn btn-outline-warning">
+                <i class="bi bi-plus-circle me-2"></i>Asociar Membresía
+            </a>
+            <a href="{{ route('medidas.create', ['socia_id' => $socia->id]) }}" class="btn btn-outline-success">
+                <i class="bi bi-rulers me-2"></i>Registrar medida
+            </a>
+          </div>
+        </div>
+
         {{-- SECCIÓN: Información General --}}
         <div class="card mb-4">
             <div class="card-header">
@@ -118,10 +137,10 @@
                         <div>{{ $socia->ocupacion ?? 'N/A' }}</div>
                     </div>
 
-                    <div class="col-12 col-md-6 col-lg-4">
+                    <!-- <div class="col-12 col-md-6 col-lg-4">
                         <div class="small text-body-secondary">Método de Pago</div>
                         <div>{{ $socia->metodo_pago }}</div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -221,11 +240,5 @@
             </div>
         </div>
 
-        {{-- Botones de Acción --}}
-        <div class="d-flex gap-2 justify-content-end pt-4 border-top mt-5">
-            <a href="{{ route('socias.index') }}" class="btn btn-secondary">Regresar</a>
-            <a href="{{ route('medidas.create', ['socia_id' => $socia->id]) }}" class="btn btn-outline-primary">Registrar medida</a>
-            <a href="{{ route('socias.edit', $socia) }}" class="btn btn-primary">Editar</a>
-        </div>
     </div>
 </x-app-layout>

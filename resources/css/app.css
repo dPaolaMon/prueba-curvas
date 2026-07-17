@@ -27,6 +27,7 @@
 
 .theme-normal {
     --theme-color: #0d6efd;
+    --theme-color-secondary: #6c757d;
     --theme-color-dark: #0b5ed7;
     --theme-color-light: #f8f9fa;
     --theme-color-navbar: #f8f9fa;
@@ -42,6 +43,7 @@
 
 .theme-blue {
     --theme-color: #2f6fd6;
+    --theme-color-secondary: #65758a;
     --theme-color-dark: #2457a6;
     --theme-color-light: #eef4ff;
     --theme-color-navbar: #ffffff;
@@ -57,6 +59,7 @@
 
 .theme-pink {
     --theme-color: #EF26A8;
+    --theme-color-secondary: #8a6a79;
     --theme-color-dark: #c13b7c;
     --theme-color-light: #F8F9FA;
     --theme-color-navbar: #ffffff;
@@ -72,6 +75,7 @@
 
 .theme-purple {
     --theme-color: #6f42c1;
+    --theme-color-secondary: #766a8a;
     --theme-color-dark: #59359a;
     --theme-color-light: #f5f0ff;
     --theme-color-navbar: #ffffff;
@@ -87,6 +91,7 @@
 
 .theme-mint {
     --theme-color: #198754;
+    --theme-color-secondary: #6a8a7a;
     --theme-color-dark: #146c43;
     --theme-color-light: #e8f5ed;
     --theme-color-navbar: #ffffff;

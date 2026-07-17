@@ -75,6 +75,10 @@
                         </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
+                            <a class="dropdown-item" href="{{ route('membresias.index') }}">{{ __('Membresias') }}</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
                             <a class="dropdown-item" href="{{ route('medidas.index') }}">{{ __('Medidas') }}</a>
                         </li>
                         <li><hr class="dropdown-divider"></li>
@@ -214,6 +218,27 @@
             </ul>
             @endif
 
+            {{-- Administración --}}
+            @if( $administrador )
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->routeIs('ejercicios.*') || request()->routeIs('maquinas.*') ? 'active' : '' }}"
+                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ __('Administración') }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="{{ route('planes.index') }}">{{ __('Planes') }}</a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="{{ route('pagos.index') }}">{{ __('Pagos') }}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            @endif
+
             {{-- Mensajería (todos los roles) --}}
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
@@ -230,7 +255,7 @@
 
             {{-- 
             ╔═══════════════════════════════╗
-            ║ Enlaces de usuario registrado ║
+            ║ Enlaces de usuario registrado       ║
             ╚═══════════════════════════════╝--}}
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item dropdown">
@@ -308,10 +333,9 @@
                     theme: 'auto',
                     position: 'top-end',
                     icon: 'error',
-                    title: 'Error al iniciar el kiosko: ' + (data.message || 'Error desconocido'),
+                    title: data.error || 'No se pudo iniciar el kiosko.',
                     showConfirmButton: false,
-                    timer: 2200,
-                    timerProgressBar: true,
+                    showCloseButton: true,
                 });
             }
         })
@@ -321,10 +345,9 @@
                 theme: 'auto',
                 position: 'top-end',
                 icon: 'error',
-                title: 'Error de conexión: ' + error.message,
+                title: error?.message || 'Error al iniciar el kiosko.',
                 showConfirmButton: false,
-                timer: 2200,
-                timerProgressBar: true,
+                showCloseButton: true,
             });
         });
     }

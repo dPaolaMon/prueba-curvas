@@ -99,7 +99,7 @@
 
                             <div class="d-grid">
                                 <button type="button" id="toggleBtn" class="btn btn-secondary" disabled>
-                                    Selecciona socia, fecha y hora
+                                    <i class="bi bi-info-circle me-2"></i>Selecciona socia, fecha y hora
                                 </button>
                             </div>
                         </form>
@@ -229,7 +229,7 @@
 
                 if (!habilitado) {
                     toggleBtn.className = 'btn btn-secondary';
-                    toggleBtn.textContent = 'Selecciona socia, fecha y hora';
+                    toggleBtn.innerHTML = '<i class="bi bi-info-circle me-2"></i>Selecciona socia, fecha y hora';
                     toggleBtn.onclick = null;
                     statusArea.className = 'alert alert-secondary mb-4';
                     statusArea.innerHTML = 'Selecciona socia, fecha y hora para continuar.';
@@ -238,7 +238,7 @@
 
                 if (existe) {
                     toggleBtn.className = 'btn btn-danger';
-                    toggleBtn.textContent = 'Quitar Asistencia';
+                    toggleBtn.innerHTML = '<i class="bi bi-trash me-2"></i>Quitar Asistencia';
                     toggleBtn.onclick = quitarAsistencia;
                     statusArea.className = 'alert alert-success mb-4';
                     statusArea.innerHTML = '<strong>Asistencia registrada</strong><div class="small">Ya existe un registro para esta fecha.</div>';
@@ -246,7 +246,7 @@
                 }
 
                 toggleBtn.className = 'btn btn-success';
-                toggleBtn.textContent = 'Registrar Asistencia';
+                toggleBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Registrar Asistencia';
                 toggleBtn.onclick = registrarAsistencia;
                 statusArea.className = 'alert alert-light border mb-4';
                 statusArea.innerHTML = '<strong>Sin registro</strong><div class="small">No existe asistencia para esta fecha.</div>';

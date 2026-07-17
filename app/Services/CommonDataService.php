@@ -72,4 +72,20 @@ class CommonDataService
         $themes = self::getData()['temas'] ?? [];
         return array_column($themes, 'value');
     }
+
+    /**
+     * Obtiene los estatus de las membresias
+     */
+    public static function getMembresiasEstatus()
+    {
+        return self::getData()['estatus_membresia'] ?? [];
+    }
+
+    /**
+     * Alias singular para mantener consistencia de uso en controladores/vistas
+     */
+    public static function getMembresiaEstatus()
+    {
+        return self::getMembresiasEstatus();
+    }
 }

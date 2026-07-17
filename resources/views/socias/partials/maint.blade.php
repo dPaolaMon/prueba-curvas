@@ -2,7 +2,6 @@
     $editando = isset($socia) && $socia->id;
     use App\Services\CommonDataService;
     $estadosCiviles = CommonDataService::getCivilStatuses();
-    $metodosPago = CommonDataService::getPaymentMethods();
 @endphp
 
 <div>
@@ -13,17 +12,7 @@
     @endif
 
     {{-- Errores --}}
-    @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <h6 class="alert-heading">Errores en el formulario:</h6>
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-        </div>
-    @endif
+    @include('_partials.swal-form-errors')
 
     {{-- SECCIÓN: Datos Personales --}}
     <div class="mb-5 pb-3 border-bottom">
@@ -112,22 +101,6 @@
                 <label for="ocupacion" class="form-label">Ocupación</label>
                 <input type="text" id="ocupacion" name="ocupacion" class="form-control"
                        value="{{ old('ocupacion', $socia->ocupacion ?? '') }}">
-            </div>
-
-            {{-- Método de Pago --}}
-            <div class="col-12 col-md-6 col-lg-4">
-                <label for="metodo_pago" class="form-label">
-                    Método de Pago <span class="text-danger">*</span>
-                </label>
-                <input type="text" id="metodo_pago" name="metodo_pago" list="metodos_pago_list" class="form-control"
-                       value="{{ old('metodo_pago', $socia->metodo_pago ?? '') }}"
-                       placeholder="Seleccione o escriba un método de pago"
-                       required>
-                <datalist id="metodos_pago_list">
-                    @foreach($metodosPago as $metodo)
-                        <option value="{{ $metodo }}">
-                    @endforeach
-                </datalist>
             </div>
 
             {{-- Fecha de Alta --}}
@@ -266,8 +239,12 @@
 
     {{-- Botones de Acción --}}
     <div class="d-flex gap-2 justify-content-end pt-4 border-top mt-5">
-        <a href="{{ route('socias.index') }}" class="btn btn-danger">Cancelar</a>
-        <button type="submit" class="btn btn-primary">@if($editando)Actualizar @else Guardar @endif socia</button>
+        <a href="{{ route('socias.index') }}" class="btn btn-danger">
+            <i class="bi bi-x-circle me-2"></i>Cancelar
+        </a>
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle me-2"></i>@if($editando)Actualizar @else Guardar @endif socia
+        </button>
     </div>
 </div>
 

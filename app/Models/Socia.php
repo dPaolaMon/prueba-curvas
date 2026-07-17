@@ -21,7 +21,6 @@ class Socia extends Model
         'codigo_postal',
         'estado_id',
         'municipio_id',
-        'metodo_pago',
         'estatus',
         'fecha_alta',
         'fecha_reingreso',
@@ -57,5 +56,13 @@ class Socia extends Model
 
     public function medidas() {
         return $this->hasMany(Medida::class);
+    }
+
+    public function membresias() {
+        return $this->hasMany(Membresia::class);
+    }
+
+    public function pagos() {
+        return $this->hasMany(Pago::class);
     }
 }

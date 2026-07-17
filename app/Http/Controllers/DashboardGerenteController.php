@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Asistencia;
+use App\Models\Socia;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 class DashboardGerenteController extends Controller
@@ -10,105 +13,90 @@ class DashboardGerenteController extends Controller
     public function index(Request $request): View
     {
         $role = strtoupper((string) optional($request->user())->role);
+        $hoy = now()->startOfDay();
 
-        $widgetsByRole = [
-            'SOCIA' => [
-                [
-                    'title' => 'Próxima cita',
-                    'value' => '2',
-                    'note' => 'Esta semana',
-                ],
-                [
-                    'title' => 'Asistencias del mes',
-                    'value' => '9',
-                    'note' => 'Meta mensual: 12',
-                ],
-                [
-                    'title' => 'Rutina asignada',
-                    'value' => 'A',
-                    'note' => 'Última actualización: hoy',
-                ],
-                [
-                    'title' => 'Vencimiento de membresía',
-                    'value' => '15 días',
-                    'note' => 'Renovación sugerida',
-                ],
+        $asistenciasHoy = Asistencia::whereDate('fecha', $hoy)->count();
+
+        $cumpleaneras = Socia::query()
+            ->whereMonth('fecha_nacimiento', $hoy->month)
+            ->whereDay('fecha_nacimiento', $hoy->day)
+            ->orderBy('nombre')
+            ->orderBy('apellidos')
+            ->get(['nombre', 'apellidos'])
+            ->map(function (Socia $socia): string {
+                return trim($socia->nombre . ' ' . $socia->apellidos);
+            })
+            ->filter()
+            ->values();
+
+        $resumenCards = [
+            [
+                'title' => 'Ventas hoy',
+                'value' => '$2,397.00',
+                'button' => 'Ventas',
             ],
-            'ENTRENADORA' => [
-                [
-                    'title' => 'Socias activas',
-                    'value' => '128',
-                    'note' => 'Meta del mes: 150',
-                ],
-                [
-                    'title' => 'Vencen esta semana',
-                    'value' => '12',
-                    'note' => 'Recordatorios sugeridos',
-                    'badge' => [
-                        'text' => 'Seguimiento',
-                        'class' => 'bg-warning text-dark',
-                    ],
-                ],
-                [
-                    'title' => 'Citas de hoy',
-                    'value' => '7',
-                    'note' => '4 confirmadas, 3 pendientes',
-                ],
-                [
-                    'title' => 'Asistencia de hoy',
-                    'value' => '36',
-                    'note' => 'Corte a las 14:00',
-                ],
+            [
+                'title' => 'Cobros pendientes de productos',
+                'value' => '$485.00',
+                'button' => 'Ir a cobros',
             ],
-            'GERENTE' => [
-                [
-                    'title' => 'Socias activas',
-                    'value' => '128',
-                    'note' => 'Meta del mes: 150',
-                ],
-                [
-                    'title' => 'Vencen esta semana',
-                    'value' => '12',
-                    'note' => 'Recordatorios sugeridos',
-                ],
-                [
-                    'title' => 'Citas de hoy',
-                    'value' => '7',
-                    'note' => '4 confirmadas, 3 pendientes',
-                ],
-                [
-                    'title' => 'Ingresos (mes)',
-                    'value' => '$62,400',
-                    'note' => 'Última actualización: hoy',
-                ],
+            [
+                'title' => 'Citas hoy',
+                'value' => '3',
+                'button' => null,
             ],
-            'ADMINISTRADOR' => [
-                [
-                    'title' => 'Socias activas',
-                    'value' => '128',
-                    'note' => 'Meta del mes: 150',
-                ],
-                [
-                    'title' => 'Vencen esta semana',
-                    'value' => '12',
-                    'note' => 'Recordatorios sugeridos',
-                ],
-                [
-                    'title' => 'Citas de hoy',
-                    'value' => '7',
-                    'note' => '4 confirmadas, 3 pendientes',
-                ],
-                [
-                    'title' => 'Ingresos (mes)',
-                    'value' => '$62,400',
-                    'note' => 'Última actualización: hoy',
-                ],
+            [
+                'title' => 'Asistencias hoy',
+                'value' => (string) $asistenciasHoy,
+                'button' => 'Ver detalle...',
             ],
         ];
 
+        $secciones = $this->placeholderSecciones();
+
         return view('dashboards.dashboard-gerente', [
             'role' => $role,
-            'widgets' => $widgetsByRole[$role] ?? $widgetsByRole['SOCIA'],
+            'resumenCards' => $resumenCards,
+            'secciones' => $secciones,
+            'cumpleaneras' => $cumpleaneras,
+        ]);
+    }
+
+    private function placeholderSecciones(): Collection
+    {
+        return collect([
+            [
+                'title' => 'Socias con + de 2 inasistencias consecutivas',
+                'columns' => ['Num Soc.', 'Nombre', 'Inasistencias', 'Celular'],
+                'rows' => [
+                    ['1045', 'Fulana del tal', '6', '55 5555 5555'],
+                ],
+                'footer_button' => null,
+            ],
+            [
+                'title' => 'Socias con mensualidad pendiente de pago',
+                'columns' => ['Num Soc.', 'Nombre', 'Plan', 'Monto', 'Fecha'],
+                'rows' => [
+                    ['1045', 'Fulana del tal por cual', 'Relax', '$599', '2'],
+                    ['1105', 'Fulana del tal por cual', 'Normal', '$799', '3'],
+                ],
+                'footer_button' => 'Registrar cobro',
+            ],
+            [
+                'title' => 'Citas hoy',
+                'columns' => ['Hora', 'Nombre', 'Celular', 'Tipo', 'Resultado'],
+                'rows' => [
+                    ['7:30 am', 'Fulana del tal', '55 5555 5555', '1C', 'Asistió / Reagendar'],
+                    ['7:30 am', 'Fulana del tal', '55 5555 5555', 'CM', 'Nueva socia / Reagendar'],
+                ],
+                'footer_button' => 'Nueva cita',
+            ],
+            [
+                'title' => 'Gráfico de citas de CM (clase muestra) contra inscripciones que generó:',
+                'columns' => [],
+                'rows' => [],
+                'footer_button' => null,
+            ],
         ]);
     }
 }

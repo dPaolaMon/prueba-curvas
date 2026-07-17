@@ -13,7 +13,7 @@
         </div>
     @enderror
 
-    <button id="confirm-user-deletion" type="button" class="btn btn-danger">{{ __('Eliminar Cuenta') }}</button>
+    <button id="confirm-user-deletion" type="button" class="btn btn-danger"><i class="bi bi-trash me-2"></i>{{ __('Eliminar Cuenta') }}</button>
 
     <form id="delete-user-form" method="post" action="{{ route('profile.destroy') }}" class="d-none">
         @csrf

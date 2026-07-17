@@ -51,18 +51,28 @@
                         </div>
 
                         <div class="col-12 col-md-auto d-flex gap-2 flex-wrap">
-                            <button type="submit" class="btn btn-primary">Generar Reporte</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-clipboard-data me-2"></i>Generar Reporte
+                            </button>
 
                             @if(!empty($search) || request()->has('filtro'))
-                                <a href="{{ route('reportes.asistencia') }}" class="btn btn-outline-secondary">Limpiar</a>
+                                <a href="{{ route('reportes.asistencia') }}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Limpiar
+                                </a>
                             @endif
 
                             @if(count($datosReporte) > 0)
-                                <button type="button" id="btnExportarCsv" class="btn btn-outline-secondary">Exportar CSV</button>
+                                <button type="button" id="btnExportarCsv" class="btn btn-outline-secondary">
+                                    <i class="bi bi-download me-2"></i>Exportar CSV
+                                </button>
                             @endif
 
-                            <button type="button" id="btnAsistenciaHoy" class="btn btn-outline-secondary">Asistencia de hoy</button>
-                            <button type="button" id="btnAusenciasConsecutivas" class="btn btn-outline-secondary">Ausencias consecutivas</button>
+                            <button type="button" id="btnAsistenciaHoy" class="btn btn-outline-secondary">
+                                <i class="bi bi-calendar-check me-2"></i>Asistencia de hoy
+                            </button>
+                            <button type="button" id="btnAusenciasConsecutivas" class="btn btn-outline-secondary">
+                                <i class="bi bi-calendar-x me-2"></i>Ausencias consecutivas
+                            </button>
                         </div>
                     </div>
                 </form>

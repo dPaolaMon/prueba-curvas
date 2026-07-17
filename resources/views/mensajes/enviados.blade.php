@@ -15,10 +15,16 @@
 
         <div class="d-flex gap-2 justify-content-between align-items-center mb-3">
             <div class="d-flex gap-2">
-                <a href="{{ route('mensajes.index') }}" class="btn btn-outline-secondary btn-sm">Entrada</a>
-                <a href="{{ route('mensajes.enviados') }}" class="btn btn-primary btn-sm">Enviados</a>
+                <a href="{{ route('mensajes.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-inbox me-2"></i>Entrada
+                </a>
+                <a href="{{ route('mensajes.enviados') }}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-send me-2"></i>Enviados
+                </a>
             </div>
-            <a href="{{ route('mensajes.create') }}" class="btn btn-success btn-sm">Redactar</a>
+            <a href="{{ route('mensajes.create') }}" class="btn btn-success btn-sm">
+                <i class="bi bi-pencil-square me-2"></i>Redactar
+            </a>
         </div>
 
         <div class="card shadow-sm">

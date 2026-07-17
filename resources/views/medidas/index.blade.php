@@ -5,7 +5,7 @@
 
     <x-slot name="breadcrumb">
         <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('medidas.index') }}" class="link-underline-opacity-0 link-body-emphasis">Socias</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('socias.index') }}" class="link-underline-opacity-0 link-body-emphasis">Gestión de Socias</a></li>
             <li class="breadcrumb-item"><a href="{{ route('medidas.index') }}" class="link-underline-opacity-0 link-body-emphasis">Medidas</a></li>
         </ol>
     </x-slot>
@@ -40,15 +40,16 @@
                         icon: 'error',
                         title: @js(session('error')),
                         showConfirmButton: false,
-                        timer: 2600,
-                        timerProgressBar: true,
+                        showCloseButton: true,
                     });
                 });
             </script>
         @endif
 
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ route('medidas.create', ['return_to' => request()->fullUrl()]) }}" class="btn btn-primary">Nueva Medida</a>
+            <a href="{{ route('medidas.create', ['return_to' => request()->fullUrl()]) }}" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>Nueva Medida
+            </a>
         </div>
 
         <div class="table-responsive">
